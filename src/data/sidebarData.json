@@ -1,0 +1,50 @@
+{
+  "tabs": [
+    {
+      "key": "header",
+      "label": "标题"
+    },
+    {
+      "key": "imageCard",
+      "label": "图文"
+    }
+  ],
+  "productShowcase": {
+    "header": [
+      {
+        "id": "product-report",
+        "type": "header",
+        "title": "产品检测报告",
+        "subtitle": "PRODUCT TESTING REPORT"
+      },
+      {
+        "id": "conference",
+        "type": "header",
+        "title": "会议介绍",
+        "subtitle": "2024高端数字经济论坛"
+      }
+    ],
+    "imageCard": [
+      {
+        "id": "travel-card-1",
+        "type": "imageCard",
+        "imageUrl": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=200&fit=crop",
+        "title": "阿勒泰8日游",
+        "description": "一价全包8日游 0购物0隐费",
+        "price": "18888",
+        "unit": "元/人",
+        "linkText": "点击查看"
+      },
+      {
+        "id": "travel-card-2",
+        "type": "imageCard",
+        "imageUrl": "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=300&h=200&fit=crop",
+        "title": "遇见京都",
+        "description": "一价全包8日游 0购物0隐费",
+        "price": "18888",
+        "unit": "元/人",
+        "linkText": "点击查看"
+      }
+    ]
+  }
+}
