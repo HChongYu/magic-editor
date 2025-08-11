@@ -1,11 +1,22 @@
 <template>
   <NodeViewWrapper class="image-text-list-container" :class="{ 'selected': selected }">
-    <!-- 标题 - 使用 node-view-content 实现富文本 -->
+    <!-- 标题 - 改为普通 input 框 -->
     <div class="list-title">
-      <NodeViewContent 
-        class="title-content"
-        as="h3"
+      <input 
+        v-if="editing && editingField === 'title'"
+        v-model="editingData.title"
+        @blur="saveTitle"
+        @keyup.enter="saveTitle"
+        class="title-input"
+        placeholder="请输入标题..."
       />
+      <h3 
+        v-else
+        @click="startEditTitle"
+        class="title-display"
+      >
+        {{ node.attrs.title || '图文组合列表' }}
+      </h3>
     </div>
 
     <!-- 图文列表项 -->
@@ -122,13 +133,13 @@
 </template>
 
 <script>
-import { NodeViewWrapper, NodeViewContent } from '@tiptap/vue-3'
+import { NodeViewWrapper } from '@tiptap/vue-3' // 移除 NodeViewContent 导入
 
 export default {
   name: 'ImageTextListView',
   components: {
     NodeViewWrapper,
-    NodeViewContent,
+    // 移除 NodeViewContent
   },
   props: {
     node: {
@@ -166,6 +177,19 @@ export default {
     }
   },
   methods: {
+    // 新增标题编辑方法
+    startEditTitle() {
+      if (!this.editing) return
+      this.editingField = 'title'
+      this.editingData = { title: this.node.attrs.title || '图文组合列表' }
+    },
+
+    saveTitle() {
+      this.updateAttributes({ title: this.editingData.title })
+      this.editingField = null
+      this.editingData = {}
+    },
+
     toggleEdit() {
       this.editing = !this.editing
       this.editingField = null
@@ -283,7 +307,37 @@ export default {
 }
 
 .list-title {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+}
+
+.title-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 4px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.title-input:focus {
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.title-display {
+  margin: 0;
+  padding: 8px 12px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.title-display:hover {
+  border-color: #e2e8f0;
+  background-color: #f8fafc;
 }
 
 /* 标题内容样式 */

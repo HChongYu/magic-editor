@@ -30,12 +30,12 @@ declare module '@tiptap/core' {
 export const ImageTextListNode = Node.create({
     name: 'imageTextList',
     group: 'block',
-    content: 'inline*', // 允许内联内容（用于标题的富文本）
+    content: '', // 改为空，不再支持内联内容
     isolating: true,
     defining: true,
     draggable: true,
     selectable: true,
-    atom: true,
+    atom: true, // 保持原子性
 
     addAttributes() {
         return {
@@ -112,7 +112,7 @@ export const ImageTextListNode = Node.create({
                         }
 
                         return commands.insertContent({
-                            type: 'imageTextListNode',
+                            type: 'imageTextList',
                             attrs: { ...defaultAttrs, ...attributes }
                         })
                     },
