@@ -27,7 +27,6 @@
             @description-change="handleProductDescriptionChange"
             @image-change="handleProductImageChange"
           />
-          
           <!-- 编辑器区域 -->
           <div class="editor-container">
             <TiptapEditor 
@@ -40,13 +39,14 @@
               @selection-update="onSelectionUpdate"
             />
           </div>
+          <div v-html="editorHTML" class="editor-html"></div>
           
           <!-- 富文本工具栏演示区域 -->
           <div class="toolbar-demo-container">
             <RichTextToolbarDemo />
           </div>
       </div>
-      
+  
       <!-- 右侧边栏 -->
       <RightSidebar 
         :show-toolbar="showEditorToolbar"
@@ -81,6 +81,10 @@ import { EmojiNode } from '@/extensions/EmojiNode'
 import { DoubleTextNode } from '@/extensions/DoubleTextNode'
 import TextBlockNode from '@/extensions/TextBlockNode'
 import TravelCardNode from '@/extensions/TravelCardNode'
+import ImageTextListNode from '@/extensions/ImageTextListNode'
+import { TemplateNodeType } from '@/enums'
+
+
 
 export default {
   name: 'WorkSpace',
@@ -89,7 +93,7 @@ export default {
     LeftSidebar,
     RightSidebar,
     RichTextToolbarDemo,
-    ProductHeader
+    ProductHeader,
   },
   data() {
     return {
@@ -101,14 +105,15 @@ export default {
       editorInstance: null,
       showEditorToolbar: true,
       editorContent: '<h1>欢迎使用改造后的编辑器</h1><p>这个编辑器的扩展是从外部注入的！</p>',
-      
+      editorHTML: '',
       // 自定义扩展配置
       customExtensions: [
         StarterKit,
         EmojiNode,
         DoubleTextNode,
         TextBlockNode,
-        TravelCardNode
+        TravelCardNode,
+        ImageTextListNode
       ],
       
       // 左侧边栏统计数据
@@ -120,14 +125,48 @@ export default {
 
   methods: {
 
-    insertTemplate(e){
-      console.log(e)
-      if (this.editorInstance) {
-        console.log(this.editorInstance)
+    insertTemplate(templateData) {
+      console.log('插入模板:', templateData)
+      
+      if (!this.editorInstance) {
+        console.warn('编辑器实例不存在')
+        return
+      }
+      
+      if (templateData.type === TemplateNodeType.IMAGE_CARD) {
         this.editorInstance.chain().focus().insertTravelCard().run()
+      } else if (templateData.type === TemplateNodeType.HEADER) {
+        this.editorInstance.chain().focus().insertContent({
+          type: 'doubleTextNode',
+          attrs: { 
+            topColor: '#e53e3e', 
+            bottomColor: '#3182ce',
+            topText: '上段文字',
+            bottomText: '下段文字',
+            topFontSize: '16px',
+            bottomFontSize: '14px',
+            topFontWeight: 'normal',
+            bottomFontWeight: 'normal',
+            topFontStyle: 'normal',
+            bottomFontStyle: 'normal',
+            topTextDecoration: 'none',
+            bottomTextDecoration: 'none'
+          },
+          content: [
+            {
+              type: 'textBlock',
+              content: [{ type: 'text', text: '上段文字' }]
+            },
+            {
+              type: 'textBlock',
+              content: [{ type: 'text', text: '下段文字' }]
+            }
+          ]
+        }).run()
+      }else if(templateData.type === TemplateNodeType.WECHAT_STYLE){
+        this.editorInstance.chain().focus().insertImageTextList().run();
       }
     },
-
     // ProductHeader 事件处理方法
     handleProductNameChange(newName) {
       this.productName = newName
@@ -159,6 +198,8 @@ export default {
     getEditorContent() {
       if (this.$refs.tiptapEditor) {
         const content = this.$refs.tiptapEditor.getContent()
+        
+        this.editorHTML = content
         console.log('编辑器内容:', content)
         alert('编辑器内容已输出到控制台')
       }

@@ -97,6 +97,17 @@ export const DoubleTextNode = Node.create({
                 parseHTML: el => el.getAttribute('data-bottom-text-decoration') || 'none',
                 renderHTML: attrs => ({ 'data-bottom-text-decoration': attrs.bottomTextDecoration }),
             },
+            // 新增文本对齐属性
+            topTextAlign: {
+                default: 'left',
+                parseHTML: el => el.getAttribute('data-top-text-align') || 'left',
+                renderHTML: attrs => ({ 'data-top-text-align': attrs.topTextAlign }),
+            },
+            bottomTextAlign: {
+                default: 'left',
+                parseHTML: el => el.getAttribute('data-bottom-text-align') || 'left',
+                renderHTML: attrs => ({ 'data-bottom-text-align': attrs.bottomTextAlign }),
+            },
         }
     },
 
@@ -146,6 +157,17 @@ export const DoubleTextNode = Node.create({
 
     addCommands() {
         return {
+            
+            insertDoubleText: (attrs: Record<string, any>) => ({ chain }: { chain: any }) => {
+                return chain().insertContent({
+                    type: this.name,
+                    attrs,
+                    content: [
+                        { type: 'textBlock', content: [{ type: 'text', text: attrs.topText }] },
+                        { type: 'textBlock', content: [{ type: 'text', text: attrs.bottomText }] }
+                    ]
+                }).run()
+            },
             setDoubleTextColor: (which: 'top' | 'bottom', color: string) => ({ chain }: { chain: any }) => {
                 return chain().updateAttributes(this.name, { [`${which}Color`]: color }).run()
             },
@@ -174,9 +196,9 @@ export const DoubleTextNode = Node.create({
         }
     },
 
-    addNodeView() {
-        return VueNodeViewRenderer(DoubleTextView)
-    },
+    // addNodeView() {
+    //     return VueNodeViewRenderer(DoubleTextView)
+    // },
 
     addProseMirrorPlugins() {
         return [

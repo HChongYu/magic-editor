@@ -53,6 +53,33 @@
                 </div>
               </div>
             </div>
+            <!-- 在模板中添加微信风格卡片的渲染 -->
+            <div v-if="item.type === tabemplateNodeType.WECHAT_STYLE" class="wechat-style-card">
+              <div class="card-header">
+                <h4 class="card-title">{{ item.title }}</h4>
+              </div>
+              <div class="card-items">
+                <div 
+                  v-for="listItem in item.items" 
+                  :key="listItem.id"
+                  class="card-item"
+                >
+                  <img :src="listItem.image" :alt="listItem.title" class="item-image" />
+                  <div class="item-content">
+                    <h5 class="item-title">{{ listItem.title }}</h5>
+                    <p class="item-description">{{ listItem.description }}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer">
+                <a :href="item.moreLink" class="more-link">
+                  {{ item.moreText }}
+                  <svg class="arrow-icon" viewBox="0 0 24 24" width="12" height="12">
+                    <path fill="currentColor" d="M8.59 16.59L13.17 12L8.59 7.41L10 6l6 6l-6 6l-1.41-1.41z"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -457,4 +484,108 @@ export default {
 .view-details:hover {
   color: #1d4ed8;
   text-decoration: underline;
+}
+
+/* 微信风格卡片样式 */
+.wechat-style-card {
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+}
+
+.card-header {
+  padding: 16px 16px 8px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.card-items {
+  padding: 0;
+}
+
+.card-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f5f5f5;
+  transition: background-color 0.2s;
+}
+
+.card-item:hover {
+  background-color: #f9f9f9;
+}
+
+.card-item:last-child {
+  border-bottom: none;
+}
+
+.item-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 4px;
+  object-fit: cover;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-title {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  line-height: 1.4;
+}
+
+.item-description {
+  margin: 0;
+  font-size: 12px;
+  color: #666;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-footer {
+  padding: 12px 16px;
+  border-top: 1px solid #f0f0f0;
+  background-color: #fafafa;
+}
+
+.more-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1890ff;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.more-link:hover {
+  color: #40a9ff;
+}
+
+.arrow-icon {
+  margin-left: 4px;
+  transition: transform 0.2s;
+}
+
+.more-link:hover .arrow-icon {
+  transform: translateX(2px);
 }

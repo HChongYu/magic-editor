@@ -6,10 +6,9 @@
 // 编辑器相关枚举 
 // 模版节点类型
 export enum TemplateNodeType {
-  
   HEADER = 'header',
-  IMAGECARD = 'imageCard'
-
+  IMAGE_CARD = 'imageCard',
+  WECHAT_STYLE = 'weChatStyle'  // 新增微信风格类型
 }
 
 

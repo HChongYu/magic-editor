@@ -7,6 +7,10 @@
     {
       "key": "imageCard",
       "label": "图文"
+    },
+    {
+      "key": "weChatStyle",
+      "label": "微信样式"
     }
   ],
   "productShowcase": {
@@ -24,7 +28,7 @@
         "subtitle": "2024高端数字经济论坛"
       }
     ],
-    "imageCard": [
+   "imageCard":[
       {
         "id": "travel-card-1",
         "type": "imageCard",
@@ -34,16 +38,29 @@
         "price": "18888",
         "unit": "元/人",
         "linkText": "点击查看"
-      },
+      }
+    ],
+    "weChatStyle": [
       {
-        "id": "travel-card-2",
-        "type": "imageCard",
-        "imageUrl": "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=300&h=200&fit=crop",
-        "title": "遇见京都",
-        "description": "一价全包8日游 0购物0隐费",
-        "price": "18888",
-        "unit": "元/人",
-        "linkText": "点击查看"
+        "id": "image-text-list-1",
+        "type": "weChatStyle",
+        "title": "图文组合列表",
+        "items": [
+          {
+            "id": "item-1",
+            "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=80&h=80&fit=crop",
+            "title": "标题一",
+            "description": "由各种物质组成的巨型球状天体，叫做星球，星球有一定的形状，有自己的运行轨道。"
+          },
+          {
+            "id": "item-2",
+            "image": "https://images.unsplash.com/photo-1517976487492-5750f3195933?w=80&h=80&fit=crop",
+            "title": "标题二",
+            "description": "由各种物质组成的巨型球状天体，叫做星球，星球有一定的形状，有自己的运行轨道。"
+          }
+        ],
+        "moreText": "查看更多",
+        "moreLink": "#"
       }
     ]
   }
