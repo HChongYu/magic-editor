@@ -1,51 +1,35 @@
 <template>
   <node-view-wrapper 
-    class="travel-card-wrapper"
+    class="rich-travel-card-view" 
     @mouseover="showToolbar = true" 
     @mouseleave="showToolbar = false"
-    :style="{
-      '--bg-color': node.attrs.backgroundColor,
-      '--border-color': node.attrs.borderColor
-    }"
   >
-    <div class="travel-card">
-      <!-- 图片区域 -->
-      <div class="image-container" @click="handleImageClick">
-        <img 
-          :src="node.attrs.imageUrl" 
-          :alt="node.attrs.title"
-          class="card-image"
-          @error="handleImageError"
-        />
-        <div class="image-overlay">
-          <div class="overlay-text">点击更换图片</div>
-        </div>
+    <!-- 图片区域 -->
+    <div class="image-section" @click="handleImageClick">
+      <img 
+        :src="node.attrs.imageUrl || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop'" 
+        :alt="node.attrs.title || '旅游卡片图片'"
+        class="card-image"
+        @error="handleImageError"
+      />
+      <div class="image-overlay">
+        <span class="change-image-text">点击更换图片</span>
       </div>
-      
-      <!-- 内容区域 -->
-      <div class="card-content">
-        <h3 class="card-title">{{ node.attrs.title }}</h3>
-        <p class="card-subtitle">{{ node.attrs.subtitle }}</p>
-        
-        <!-- 价格和链接区域 -->
-        <div class="card-footer">
-          <div class="price-section">
-            <span class="price">{{ node.attrs.price }}</span>
-            <span class="unit">{{ node.attrs.unit }}</span>
-          </div>
-          <div class="link-section">
-            <span class="link-text">{{ node.attrs.linkText }}</span>
-            <svg class="arrow-icon" viewBox="0 0 24 24" width="16" height="16">
-              <path fill="currentColor" d="M8.59 16.59L13.17 12L8.59 7.41L10 6l6 6l-6 6l-1.41-1.41z"/>
-            </svg>
-          </div>
-        </div>
+    </div>
+    
+    <!-- 内容区域 -->
+    <div class="content-section">
+      <h3 class="card-title">{{ node.attrs.title || '标题' }}</h3>
+      <p class="card-subtitle">{{ node.attrs.subtitle || '副标题' }}</p>
+      <div class="card-footer">
+        <span class="card-price">{{ node.attrs.price || '价格' }}</span>
+        <span class="card-unit">{{ node.attrs.unit || '单位' }}</span>
       </div>
     </div>
     
     <!-- 工具栏 -->
-    <div v-if="showToolbar" class="toolbar-wrapper">
-      <travel-card-settings 
+    <div v-if="showToolbar" class="toolbar">
+      <RichTravelCardSettings 
         :node="node" 
         :update-attributes="updateAttributes" 
         :editor="editor" 
@@ -67,13 +51,13 @@
 
 <script>
 import { NodeViewWrapper } from '@tiptap/vue-3'
-import TravelCardSettings from './TravelCardSettings.vue'
+import RichTravelCardSettings from './RichTravelCardSettings.vue'
 
 export default {
-  name: 'TravelCardView',
+  name: 'RichTravelCardView',
   components: {
     NodeViewWrapper,
-    TravelCardSettings,
+    RichTravelCardSettings,
   },
   props: {
     node: {
@@ -140,23 +124,29 @@ export default {
 </script>
 
 <style scoped>
-.travel-card-wrapper {
+.rich-travel-card-wrapper {
   position: relative;
   margin: 16px 0;
   max-width: 600px;
 }
 
-.travel-card {
+.rich-travel-card {
   display: flex;
   background: var(--bg-color, #ffffff);
-  border: 2px solid var(--border-color, #2196f3);
+  border: 2px solid var(--border-color, #e2e8f0);
   border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s ease;
   cursor: pointer;
 }
 
-.travel-card:hover {
+/* 选中状态样式 */
+.rich-travel-card-wrapper.selected .rich-travel-card {
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.rich-travel-card:hover {
   box-shadow: 0 8px 25px rgba(33, 150, 243, 0.15);
   transform: translateY(-2px);
 }
@@ -203,105 +193,65 @@ export default {
   font-size: 14px;
   font-weight: 500;
   text-align: center;
-  padding: 8px;
 }
 
 .card-content {
   flex: 1;
-  padding: 20px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
 }
 
-.card-title {
-  font-size: 24px;
-  font-weight: bold;
-  color: #333;
-  margin: 0 0 8px 0;
-  line-height: 1.2;
-}
-
-.card-subtitle {
-  font-size: 14px;
-  color: #666;
-  margin: 0 0 16px 0;
-  line-height: 1.4;
-}
-
-.card-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.price-section {
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
-}
-
-.price {
-  font-size: 28px;
-  font-weight: bold;
-  color: #2196f3;
-  line-height: 1;
-}
-
-.unit {
-  font-size: 14px;
-  color: #666;
-}
-
-.link-section {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: #2196f3;
-  font-size: 14px;
-  transition: color 0.3s ease;
-}
-
-.link-section:hover {
-  color: #1976d2;
-}
-
-.arrow-icon {
-  transition: transform 0.3s ease;
-}
-
-.link-section:hover .arrow-icon {
-  transform: translateX(2px);
+.rich-content {
+  flex: 1;
 }
 
 .toolbar-wrapper {
   position: absolute;
-  top: -40px;
+  top: -50px;
+  left: 0;
   right: 0;
   z-index: 10;
 }
 
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .travel-card {
-    flex-direction: column;
-  }
-  
-  .image-container {
-    width: 100%;
-    height: 200px;
-  }
-  
-  .card-content {
-    padding: 16px;
-  }
-  
-  .card-title {
-    font-size: 20px;
-  }
-  
-  .price {
-    font-size: 24px;
-  }
+/* 富文本内容样式 */
+.rich-content :deep(.rich-card-title) {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.rich-content :deep(.rich-card-subtitle) {
+  font-size: 14px;
+  color: #718096;
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+}
+
+.rich-content :deep(.rich-card-price) {
+  font-size: 24px;
+  font-weight: 700;
+  color: #e53e3e;
+  margin: 0;
+}
+
+.rich-content :deep(.rich-card-unit) {
+  font-size: 14px;
+  color: #718096;
+  margin: 0 0 12px 0;
+}
+
+.rich-content :deep(.rich-card-link) {
+  font-size: 14px;
+  color: #3182ce;
+  font-weight: 500;
+  margin: 0;
+  cursor: pointer;
+}
+
+.rich-content :deep(.rich-card-link):hover {
+  color: #2c5aa0;
 }
 </style>

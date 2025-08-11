@@ -133,13 +133,13 @@
 </template>
 
 <script>
-import { NodeViewWrapper } from '@tiptap/vue-3' // 移除 NodeViewContent 导入
+import { NodeViewWrapper, NodeViewContent } from '@tiptap/vue-3'
 
 export default {
   name: 'ImageTextListView',
   components: {
     NodeViewWrapper,
-    // 移除 NodeViewContent
+    NodeViewContent,
   },
   props: {
     node: {
@@ -286,6 +286,10 @@ export default {
       if (this.node.attrs.moreLink && this.node.attrs.moreLink !== '#') {
         window.open(this.node.attrs.moreLink, '_blank')
       }
+    },
+    handleImageError(event) {
+      const target = event.target
+      target.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop'
     },
   },
 }
