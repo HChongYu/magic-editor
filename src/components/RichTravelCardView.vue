@@ -4,38 +4,61 @@
     @mouseover="showToolbar = true" 
     @mouseleave="showToolbar = false"
   >
-    <!-- 图片区域 -->
-    <div class="image-section" @click="handleImageClick">
-      <img 
-        :src="node.attrs.imageUrl || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop'" 
-        :alt="node.attrs.title || '旅游卡片图片'"
-        class="card-image"
-        @error="handleImageError"
-      />
-      <div class="image-overlay">
-        <span class="change-image-text">点击更换图片</span>
+    <!-- 卡片主体 -->
+    <div class="travel-card" :class="{ 'selected': selected }">
+      <!-- 图片区域 -->
+      <div class="image-section" @click="handleImageClick">
+        <img 
+          :src="node.attrs.imageUrl || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop'" 
+          :alt="node.attrs.title || '旅游卡片图片'"
+          class="card-image"
+          @error="handleImageError"
+        />
+        <div class="image-overlay">
+          <span class="change-image-text">点击更换图片</span>
+        </div>
+      </div>
+      
+      <!-- 内容区域 -->
+      <div class="content-section">
+        <!-- 标题 -->
+        <h3 class="card-title">{{ node.attrs.title || '阿勒泰8日游' }}</h3>
+        
+        <!-- 副标题 -->
+        <p class="card-subtitle">{{ node.attrs.subtitle || '一价全包自由行 0购买0低价' }}</p>
+        
+        <!-- 价格和按钮区域 -->
+        <div class="card-footer">
+          <div class="price-section">
+            <span class="card-price">{{ node.attrs.price || '18888' }}</span>
+            <span class="card-unit">{{ node.attrs.unit || '元/人' }}</span>
+          </div>
+          <div class="action-section">
+            <span class="view-details-btn">{{ node.attrs.buttonText || '点击查看' }}</span>
+            <span class="arrow">></span>
+          </div>
+        </div>
       </div>
     </div>
     
-    <!-- 内容区域 -->
-    <div class="content-section">
-      <h3 class="card-title">{{ node.attrs.title || '标题' }}</h3>
-      <p class="card-subtitle">{{ node.attrs.subtitle || '副标题' }}</p>
-      <div class="card-footer">
-        <span class="card-price">{{ node.attrs.price || '价格' }}</span>
-        <span class="card-unit">{{ node.attrs.unit || '单位' }}</span>
+    <!-- 浮窗工具栏 -->
+    <div v-if="showToolbar" class="floating-toolbar">
+      <div class="toolbar-content">
+        <button class="toolbar-btn" @click="duplicateCard" title="复制">
+          📋
+        </button>
+        <button class="toolbar-btn" @click="deleteCard" title="删除">
+          🗑️
+        </button>
+        <div class="toolbar-divider"></div>
+        <RichTravelCardSettings 
+          :node="node" 
+          :update-attributes="updateAttributes" 
+          :editor="editor" 
+          :get-pos="getPos"
+          @image-change="handleImageChange"
+        />
       </div>
-    </div>
-    
-    <!-- 工具栏 -->
-    <div v-if="showToolbar" class="toolbar">
-      <RichTravelCardSettings 
-        :node="node" 
-        :update-attributes="updateAttributes" 
-        :editor="editor" 
-        :get-pos="getPos"
-        @image-change="handleImageChange"
-      />
     </div>
     
     <!-- 隐藏的文件输入 -->
@@ -92,7 +115,6 @@ export default {
   },
   methods: {
     handleImageClick() {
-      // 触发文件选择
       this.$refs.fileInput?.click()
     },
     
@@ -101,11 +123,8 @@ export default {
       const file = target.files?.[0]
       
       if (file) {
-        // 创建文件URL
         const imageUrl = URL.createObjectURL(file)
         this.updateAttributes({ imageUrl })
-        
-        // 清空input值，允许重复选择同一文件
         target.value = ''
       }
     },
@@ -116,47 +135,64 @@ export default {
     
     handleImageError(event) {
       const target = event.target
-      // 设置默认图片
       target.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop'
+    },
+    
+    duplicateCard() {
+      const pos = this.getPos()
+      if (pos !== undefined) {
+        this.editor.chain().focus().insertContentAt(pos + this.node.nodeSize, {
+          type: 'richTravelCard',
+          attrs: { ...this.node.attrs }
+        }).run()
+      }
+    },
+    
+    deleteCard() {
+      const pos = this.getPos()
+      if (pos !== undefined) {
+        this.editor.chain().focus().deleteRange({ from: pos, to: pos + this.node.nodeSize }).run()
+      }
     },
   },
 }
 </script>
 
 <style scoped>
-.rich-travel-card-wrapper {
+.rich-travel-card-view {
   position: relative;
   margin: 16px 0;
-  max-width: 600px;
+  max-width: 560px;
 }
 
-.rich-travel-card {
+.travel-card {
   display: flex;
-  background: var(--bg-color, #ffffff);
-  border: 2px solid var(--border-color, #e2e8f0);
-  border-radius: 12px;
+  background: #ffffff;
+  border: 2px solid #4A90E2;
+  border-radius: 8px;
   overflow: hidden;
   transition: all 0.3s ease;
-  cursor: pointer;
+  min-height: 140px;
 }
 
 /* 选中状态样式 */
-.rich-travel-card-wrapper.selected .rich-travel-card {
-  border-color: #3182ce;
-  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+.travel-card.selected {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
 }
 
-.rich-travel-card:hover {
-  box-shadow: 0 8px 25px rgba(33, 150, 243, 0.15);
-  transform: translateY(-2px);
+.travel-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
 }
 
-.image-container {
+.image-section {
   position: relative;
   flex-shrink: 0;
-  width: 200px;
-  height: 150px;
+  width: 150px;
+  height: 140px;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .card-image {
@@ -166,7 +202,7 @@ export default {
   transition: transform 0.3s ease;
 }
 
-.image-container:hover .card-image {
+.image-section:hover .card-image {
   transform: scale(1.05);
 }
 
@@ -176,7 +212,7 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -184,74 +220,157 @@ export default {
   transition: opacity 0.3s ease;
 }
 
-.image-container:hover .image-overlay {
+.image-section:hover .image-overlay {
   opacity: 1;
 }
 
-.overlay-text {
+.change-image-text {
   color: white;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
   text-align: center;
 }
 
-.card-content {
+.content-section {
   flex: 1;
-  padding: 16px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 }
 
-.rich-content {
-  flex: 1;
-}
-
-.toolbar-wrapper {
-  position: absolute;
-  top: -50px;
-  left: 0;
-  right: 0;
-  z-index: 10;
-}
-
-/* 富文本内容样式 */
-.rich-content :deep(.rich-card-title) {
+.card-title {
   font-size: 18px;
   font-weight: 600;
-  color: #1a202c;
+  color: #333333;
   margin: 0 0 8px 0;
+  line-height: 1.3;
+}
+
+.card-subtitle {
+  font-size: 13px;
+  color: #666666;
+  margin: 0 0 16px 0;
   line-height: 1.4;
 }
 
-.rich-content :deep(.rich-card-subtitle) {
-  font-size: 14px;
-  color: #718096;
-  margin: 0 0 12px 0;
-  line-height: 1.4;
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.rich-content :deep(.rich-card-price) {
+.price-section {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.card-price {
   font-size: 24px;
   font-weight: 700;
-  color: #e53e3e;
-  margin: 0;
+  color: #4A90E2;
+  line-height: 1;
 }
 
-.rich-content :deep(.rich-card-unit) {
+.card-unit {
   font-size: 14px;
-  color: #718096;
-  margin: 0 0 12px 0;
+  color: #666666;
 }
 
-.rich-content :deep(.rich-card-link) {
+.action-section {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.view-details-btn {
+  color: #4A90E2;
   font-size: 14px;
-  color: #3182ce;
-  font-weight: 500;
-  margin: 0;
   cursor: pointer;
+  text-decoration: underline;
 }
 
-.rich-content :deep(.rich-card-link):hover {
-  color: #2c5aa0;
+.view-details-btn:hover {
+  color: #357ABD;
+}
+
+.arrow {
+  color: #4A90E2;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* 浮窗工具栏样式 */
+.floating-toolbar {
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  animation: fadeInUp 0.2s ease-out;
+}
+
+.toolbar-content {
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  padding: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  gap: 4px;
+}
+
+.toolbar-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.toolbar-btn:hover {
+  background: #f5f5f5;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 20px;
+  background: #e8e8e8;
+  margin: 0 4px;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 480px) {
+  .travel-card {
+    flex-direction: column;
+  }
+  
+  .image-section {
+    width: 100%;
+    height: 150px;
+  }
+  
+  .content-section {
+    padding: 12px;
+  }
 }
 </style>

@@ -7,7 +7,6 @@
       @mouseenter="handleMouseEnter('productName')"
       @mouseleave="handleMouseLeave('productName')"
     >
-      <div class="section-label">产品名称</div>
       <TiptapEditor 
         ref="tiptapEditor1"
         :extensions="customExtensions"
@@ -18,9 +17,7 @@
         @update="onEditorUpdate"
         @selection-update="onSelectionUpdate"
       />
-      <div v-if="isHovered('productName')" class="hover-indicator">
-        正在编辑产品名称
-      </div>
+    
     </div>
     
     <!-- 产品描述区域 -->
@@ -30,7 +27,6 @@
       @mouseenter="handleMouseEnter('productDescription')"
       @mouseleave="handleMouseLeave('productDescription')"
     >
-      <div class="section-label">产品描述</div>
       <TiptapEditor 
         ref="tiptapEditor2"
         :extensions="customExtensions"
@@ -40,36 +36,6 @@
         @editor-ready="onEditorReady"
         @update="onEditorUpdate"
         @selection-update="onSelectionUpdate"
-      />
-      <div v-if="isHovered('productDescription')" class="hover-indicator">
-        正在编辑产品描述
-      </div>
-    </div>
-    
-    <!-- 图片上传区域 -->
-    <div 
-      class="product-image-section"
-      :class="{ 'hovered': isHovered('imageUpload') }"
-      @mouseenter="handleMouseEnter('imageUpload')"
-      @mouseleave="handleMouseLeave('imageUpload')"
-    >
-      <div class="section-label">产品图片</div>
-      <div class="image-upload-area" @click="triggerImageUpload">
-        <img v-if="localProductImage" :src="localProductImage" alt="产品图片" class="product-image" />
-        <div v-else class="image-placeholder">
-          <div class="upload-icon">📷</div>
-          <div class="upload-text">点击上传产品图片</div>
-        </div>
-        <div v-if="isHovered('imageUpload')" class="hover-indicator">
-          {{ localProductImage ? '点击更换图片' : '点击上传图片' }}
-        </div>
-      </div>
-      <input 
-        ref="imageInput" 
-        type="file" 
-        accept="image/*" 
-        style="display: none" 
-        @change="handleImageUpload"
       />
     </div>
   </div>
@@ -203,18 +169,14 @@ export default {
 }
 
 .product-name-section {
-  display: flex;
-  flex-direction: column;
+
   padding: 15px;
   border-radius: 8px;
-  transition: all 0.3s ease;
-  position: relative;
+
 }
 
 .product-name-section.hovered {
-  background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+ border: 1px solid #007bff;
 }
 
 .product-name-input {
