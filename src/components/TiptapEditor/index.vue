@@ -212,24 +212,7 @@ export default {
         getDefaultContent() {
             return `
                 <h1>欢迎使用扩展的 Tiptap 编辑器</h1>
-                <p>这是一个演示如何扩展现有 Tiptap 扩展的示例。</p>
-                <ul>
-                  <li>项目符号列表现在使用 Ctrl+L 快捷键</li>
-                  <li>段落可以设置颜色</li>
-                  <li>引用块只能包含段落</li>
-                  <li>可以插入表情符号节点</li>
-                  <li>表情符号的标签文字可以编辑</li>
-                  <li>双文本节点支持选中后弹出颜色选择器</li>
-                  <li>双文本节点和表情符号支持拖拽移动</li>
-                  <li>使用 Ctrl+D 复制节点，Delete 键删除节点</li>
-                </ul>
-                <blockquote>
-                  <p>这是一个引用块，只能包含段落内容。</p>
-                </blockquote>
-                <p>试试插入一些表情符号吧！😊</p>
-                <p>点击下面的表情符号，然后尝试编辑它们的标签文字：</p>
-                <p>这是一个可编辑的表情符号：<span data-type="emoji" data-emoji="😊" class="emoji-node"><span class="emoji" style="font-size: 16px;">😊</span><span class="label" style="font-size: 12px; color: #666;">点击编辑我</span></span></p>
-                <p>这是另一个：<span data-type="emoji" data-emoji="❤️" class="emoji-node"><span class="emoji" style="font-size: 16px;">❤️</span><span class="label" style="font-size: 12px; color: #666;">爱心标签</span></span></p>
+                <p>这是一个演示如何扩展现有 Tiptap 扩展的示例。</p> 
             `
         },
 

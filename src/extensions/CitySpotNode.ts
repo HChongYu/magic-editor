@@ -28,13 +28,13 @@ export const CitySpotNode = Node.create({
   
   group: 'block',
   
-  isolating: true,
-  
   defining: true,
   
   draggable: true,
-  
+
   selectable: true,
+
+
 
   addAttributes() {
     return {
@@ -43,20 +43,6 @@ export const CitySpotNode = Node.create({
         parseHTML: element => element.getAttribute('data-image-url'),
         renderHTML: attributes => ({
           'data-image-url': attributes.imageUrl,
-        }),
-      },
-      title: {
-        default: '涉谷十字路口',
-        parseHTML: element => element.getAttribute('data-title'),
-        renderHTML: attributes => ({
-          'data-title': attributes.title,
-        }),
-      },
-      description: {
-        default: '将行程安排、景色照片、出行保险、路线特色等内容做成二维码',
-        parseHTML: element => element.getAttribute('data-description'),
-        renderHTML: attributes => ({
-          'data-description': attributes.description,
         }),
       }
     }

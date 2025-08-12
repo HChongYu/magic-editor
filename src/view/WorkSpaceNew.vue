@@ -1,20 +1,36 @@
 <template>
   <div class="workspace-layout">
     <!-- 左侧边栏组件 -->
-    <LeftSidebar @template-selected="insertTemplate" @category-changed="onCategoryChanged" />
+    <LeftSidebar 
+      :editorInstance="editorInstance" 
+      @template-selected="insertTemplate" 
+      @category-changed="onCategoryChanged" 
+    />
 
     <!-- 主内容区 -->
     <main class="main-content">
       <div class="editor-container">
-        <TiptapEditor ref="tiptapEditor" extensions="customExtensions" :initial-content="editorContent"
-          :show-toolbar="showEditorToolbar" @editor-ready="onEditorReady" @update="onEditorUpdate"
-          @selection-update="onSelectionUpdate" />
+        <TiptapEditor 
+          ref="tiptapEditor" 
+          :extensions="customExtensions" 
+          :initial-content="editorContent"
+          :show-toolbar="showEditorToolbar" 
+          @editor-ready="onEditorReady" 
+          @update="onEditorUpdate"
+          @selection-update="onSelectionUpdate" 
+        />
       </div>
     </main>
 
     <!-- 右侧边栏组件 -->
-    <ControlPanel @toolbar-toggle="onToolbarToggle" @tab-changed="onTabChanged" @preview-generated="onPreviewGenerated"
-      @open-settings="onOpenSettings" @setting-changed="onSettingChanged" @privacy-changed="onPrivacyChanged" />
+    <ControlPanel 
+      @toolbar-toggle="onToolbarToggle" 
+      @tab-changed="onTabChanged" 
+      @preview-generated="onPreviewGenerated"
+      @open-settings="onOpenSettings" 
+      @setting-changed="onSettingChanged" 
+      @privacy-changed="onPrivacyChanged" 
+    />
   </div>
 </template>
 
@@ -25,6 +41,9 @@ import ControlPanel from '../components/RightSidebar/ControlPanel.vue'
 
 // 导入自定义节点扩展
 import CitySpotNode from '@/extensions/CitySpotNode'
+// Change this line:
+// To this:
+import { SimpleHeading } from '@/extensions/SimpleHeading'
 
 import { TemplateNodeType } from '@/enums'
 
@@ -43,7 +62,8 @@ export default {
       editorContent: '',
       editorHTML: '',
       customExtensions: [
-        CitySpotNode
+        CitySpotNode,
+        SimpleHeading
       ]
     }
   },

@@ -26,7 +26,8 @@
     <!-- 模版内容区 -->
     <div class="template-content">
 
-      <div class="template-section" v-for="section in sidebarData.templateSections[activeType]" :key="section.type">
+      <div class="template-section" v-for="section in sidebarData.templateSections[activeType]" :key="section.type"
+        @click="insertTemplate(section)">
 
         {{ section.leftTitle }}
 
@@ -38,38 +39,21 @@
 
 <script>
 import sidebarData from '@/data/leftSidebarData.json'
-import { TemplateNodeType } from '@/enums'
+import { TemplateNodeType, DiyNodeType } from '@/enums'
 
 export default {
   name: 'TemplateLibrary',
+  props: {
+    editorInstance: {
+      type: null,
+      default: null,
+    },
+  },
   data() {
     return {
       searchQuery: '',
       sidebarData: sidebarData,
-      activeType: TemplateNodeType.ALL,
-    }
-  },
-  computed: {
-    // 计算所有模版的总数
-    totalTemplatesCount() {
-      return this.sidebarData.templateSections.reduce((total, section) => {
-        return total + section.templates.length
-      }, 0)
-    },
-
-    // 根据搜索条件过滤模版
-    filteredSections() {
-      if (!this.searchQuery.trim()) {
-        return this.sidebarData.templateSections
-      }
-
-      return this.sidebarData.templateSections.map(section => ({
-        ...section,
-        templates: section.templates.filter(template =>
-          template.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-          (template.description && template.description.toLowerCase().includes(this.searchQuery.toLowerCase()))
-        )
-      })).filter(section => section.templates.length > 0)
+      activeType: TemplateNodeType.IMAGE_TEXT,
     }
   },
   methods: {
@@ -80,15 +64,22 @@ export default {
     },
 
     insertTemplate(template) {
-      this.$emit('template-selected', template)
-    },
+      const { type, config } = template
+      const editor = this.editorInstance
+      if (!editor) {
+        return
+      }
+      switch (type) {
+        case DiyNodeType.LARGE_IMAGE_TEXT1:
+          editor.commands.insertCitySpot({
+            title: config.title,
+            description: config.description,
+            imageUrl: config.image,
 
-    // 根据分类筛选模版
-    filterByCategory(categoryName) {
-      // 这里可以根据分类名称筛选模版
-      // 实际实现可以在JSON数据中为每个模版添加category字段
-      console.log('筛选分类:', categoryName)
-    }
+          })
+          break
+      }
+    },
   }
 }
 </script>

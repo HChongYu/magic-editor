@@ -1,86 +1,33 @@
 <template>
-  <node-view-wrapper 
-    class="city-spot-wrapper"
-    @mouseover="showToolbar = true" 
-    @mouseleave="showToolbar = false"
-    :style="{
-      '--bg-color': node.attrs.backgroundColor,
-      '--border-color': node.attrs.borderColor
-    }"
-  >
-    <div class="city-spot-card">
-      <!-- 主图片区域 -->
-      <div class="main-image-container" @click="handleImageClick">
-        <img 
-          :src="node.attrs.imageUrl" 
-          :alt="node.attrs.title"
-          class="main-image"
-          @error="handleImageError"
-        />
-        <div class="image-overlay">
-          <div class="overlay-text">点击更换图片</div>
-        </div>
-      </div>
-      
-      <!-- 内容区域 -->
-      <div class="content-section">
-        <h2 class="spot-title" @click="editTitle" v-if="!editingTitle">{{ node.attrs.title }}</h2>
-        <input 
-          v-else
-          v-model="tempTitle"
-          @blur="saveTitle"
-          @keyup.enter="saveTitle"
-          @keyup.esc="cancelEdit"
-          class="title-input"
-          ref="titleInput"
-        />
-        
-        <p class="spot-description" @click="editDescription" v-if="!editingDescription">{{ node.attrs.description }}</p>
-        <textarea 
-          v-else
-          v-model="tempDescription"
-          @blur="saveDescription"
-          @keyup.esc="cancelEdit"
-          class="description-input"
-          ref="descriptionInput"
-        ></textarea>
-        
-        <!-- 二维码区域 -->
-        <div class="qr-section" v-if="node.attrs.qrCode">
-          <div class="qr-placeholder">
-            <div class="qr-icon">📱</div>
-            <span class="qr-text">扫码查看详情</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- 工具栏 -->
-    <div v-if="showToolbar" class="toolbar-wrapper">
-      <city-spot-settings 
-        :node="node" 
-        :update-attributes="updateAttributes" 
-        :editor="editor" 
-        :get-pos="getPos"
-        @image-change="handleImageChange"
-        @delete="handleDelete"
+  <node-view-wrapper class="city-spot-wrapper" >
+    <!-- 图片区域 -->
+    <div class="image-container" @click="handleImageClick">
+      <img 
+        :src="node.attrs.imageUrl || 'https://via.placeholder.com/600x400?text=Click+to+upload+image'"
+        :alt="node.attrs.title"
+        @error="handleImageError"
+        class="spot-image"
+      />
+      <input 
+        ref="fileInput"
+        type="file" 
+        accept="image/*" 
+        @change="handleFileChange"
+        style="display: none;"
       />
     </div>
-    
-    <!-- 隐藏的文件输入 -->
-    <input 
-      ref="fileInput"
-      type="file"
-      accept="image/*"
-      style="display: none"
-      @change="handleFileChange"
-    />
+
+    <!-- 内容区域 -->
+    <NodeViewContent class="content-area">
+      
+    </NodeViewContent>
+
   </node-view-wrapper>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, nextTick, type PropType } from 'vue'
-import { NodeViewWrapper } from '@tiptap/vue-3'
+import { defineComponent, nextTick, type PropType } from 'vue'
+import { NodeViewWrapper, NodeViewContent } from '@tiptap/vue-3'
 import type { Node } from '@tiptap/pm/model'
 import type { Editor } from '@tiptap/core'
 import CitySpotSettings from './CitySpotSettings.vue'
@@ -98,6 +45,7 @@ export default defineComponent({
   name: 'CitySpotView',
   components: {
     NodeViewWrapper,
+    NodeViewContent,
     CitySpotSettings,
   },
   props: {
@@ -126,111 +74,107 @@ export default defineComponent({
       default: false,
     },
   },
-  setup(props) {
-    const showToolbar = ref(false)
-    const editingTitle = ref(false)
-    const editingDescription = ref(false)
-    const tempTitle = ref('')
-    const tempDescription = ref('')
-    const fileInput = ref<HTMLInputElement>()
-    const titleInput = ref<HTMLInputElement>()
-    const descriptionInput = ref<HTMLTextAreaElement>()
-
-    const handleImageClick = () => {
-      fileInput.value?.click()
+  data() {
+    return {
+      showToolbar: false,
+      editingTitle: false,
+      editingDescription: false,
+      tempTitle: '',
+      tempDescription: '',
     }
+  },
+  methods: {
+    handleImageClick(): void {
+      (this.$refs.fileInput as HTMLInputElement)?.click()
+    },
     
-    const handleFileChange = (event: Event) => {
+    handleFileChange(event: Event): void {
       const target = event.target as HTMLInputElement
       const file = target.files?.[0]
       if (file) {
         const reader = new FileReader()
         reader.onload = (e) => {
-          props.updateAttributes({
+          this.updateAttributes({
             imageUrl: e.target?.result as string
           })
         }
         reader.readAsDataURL(file)
       }
-    }
+    },
     
-    const handleImageError = (event: Event) => {
+    handleImageError(event: Event): void {
       const target = event.target as HTMLImageElement
       target.src = 'https://via.placeholder.com/600x400?text=Image+Not+Found'
-    }
+    },
     
-    const handleImageChange = (imageUrl: string) => {
-      props.updateAttributes({ imageUrl })
-    }
+    handleImageChange(imageUrl: string): void {
+      this.updateAttributes({ imageUrl })
+    },
     
-    const editTitle = () => {
-      editingTitle.value = true
-      tempTitle.value = props.node.attrs.title
+    editTitle(): void {
+      this.editingTitle = true
+      this.tempTitle = this.node.attrs.title
       nextTick(() => {
-        titleInput.value?.focus()
+        (this.$refs.titleInput as HTMLInputElement)?.focus()
       })
-    }
+    },
     
-    const saveTitle = () => {
-      if (tempTitle.value.trim()) {
-        props.updateAttributes({ title: tempTitle.value.trim() })
+    saveTitle(): void {
+      if (this.tempTitle.trim()) {
+        this.updateAttributes({ title: this.tempTitle.trim() })
       }
-      editingTitle.value = false
-    }
+      this.editingTitle = false
+    },
     
-    const editDescription = () => {
-      editingDescription.value = true
-      tempDescription.value = props.node.attrs.description
+    editDescription(): void {
+      this.editingDescription = true
+      this.tempDescription = this.node.attrs.description
       nextTick(() => {
-        descriptionInput.value?.focus()
+        (this.$refs.descriptionInput as HTMLTextAreaElement)?.focus()
       })
-    }
+    },
     
-    const saveDescription = () => {
-      if (tempDescription.value.trim()) {
-        props.updateAttributes({ description: tempDescription.value.trim() })
+    saveDescription(): void {
+      if (this.tempDescription.trim()) {
+        this.updateAttributes({ description: this.tempDescription.trim() })
       }
-      editingDescription.value = false
-    }
+      this.editingDescription = false
+    },
     
-    const cancelEdit = () => {
-      editingTitle.value = false
-      editingDescription.value = false
-      tempTitle.value = ''
-      tempDescription.value = ''
-    }
+    cancelEdit(): void {
+      this.editingTitle = false
+      this.editingDescription = false
+      this.tempTitle = ''
+      this.tempDescription = ''
+    },
     
-    const handleDelete = () => {
-      if (props.deleteNode) {
-        props.deleteNode()
+    handleDelete(): void {
+      if (this.deleteNode) {
+        this.deleteNode()
       }
-    }
-
-    return {
-      showToolbar,
-      editingTitle,
-      editingDescription,
-      tempTitle,
-      tempDescription,
-      fileInput,
-      titleInput,
-      descriptionInput,
-      handleImageClick,
-      handleFileChange,
-      handleImageError,
-      handleImageChange,
-      editTitle,
-      saveTitle,
-      editDescription,
-      saveDescription,
-      cancelEdit,
-      handleDelete,
-    }
+    },
   },
 })
 </script>
 
 <style scoped>
+.content-editable {
+  outline: none;
+}
+
+.content-editable h2.spot-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.content-editable p.spot-description {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #666;
+  margin: 0;
+}
 .city-spot-wrapper {
   position: relative;
   margin: 16px 0;
@@ -243,158 +187,125 @@ export default defineComponent({
 }
 
 .city-spot-wrapper:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.city-spot-card {
-  display: flex;
-  flex-direction: column;
-  min-height: 400px;
-}
-
-.main-image-container {
-  position: relative;
-  height: 250px;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.main-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.main-image-container:hover .main-image {
-  transform: scale(1.05);
-}
-
-.image-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.main-image-container:hover .image-overlay {
-  opacity: 1;
-}
-
-.overlay-text {
-  color: white;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.content-section {
-  padding: 24px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.spot-title {
-  font-size: 28px;
-  font-weight: bold;
-  color: #1f2937;
-  margin: 0 0 16px 0;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.spot-title:hover {
-  color: #3b82f6;
-}
-
-.title-input {
-  font-size: 28px;
-  font-weight: bold;
-  color: #1f2937;
-  border: 2px solid #3b82f6;
-  border-radius: 6px;
-  padding: 8px 12px;
-  margin: 0 0 16px 0;
-  background: white;
-  outline: none;
-}
-
-.spot-description {
-  font-size: 16px;
-  color: #6b7280;
-  line-height: 1.6;
-  margin: 0 0 20px 0;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.spot-description:hover {
-  color: #374151;
-}
-
-.description-input {
-  font-size: 16px;
-  color: #6b7280;
-  line-height: 1.6;
-  border: 2px solid #3b82f6;
-  border-radius: 6px;
-  padding: 12px;
-  margin: 0 0 20px 0;
-  background: white;
-  outline: none;
-  resize: vertical;
-  min-height: 80px;
-  font-family: inherit;
-}
-
-.qr-section {
-  margin-top: auto;
-  display: flex;
-  justify-content: center;
-}
-
-.qr-placeholder {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  background: #f3f4f6;
-  border-radius: 8px;
-  color: #6b7280;
-  font-size: 14px;
-}
-
-.qr-icon {
-  font-size: 18px;
-}
-
-.toolbar-wrapper {
+.toolbar {
   position: absolute;
   top: 8px;
   right: 8px;
   z-index: 10;
+  display: flex;
+  gap: 4px;
 }
 
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .content-section {
-    padding: 16px;
-  }
-  
-  .spot-title {
-    font-size: 24px;
-  }
-  
-  .main-image-container {
-    height: 200px;
-  }
+.delete-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+  background: rgba(239, 68, 68, 1);
+  transform: scale(1.1);
+}
+
+.image-container {
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.spot-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.image-container:hover .spot-image {
+  transform: scale(1.05);
+}
+
+.content-area {
+  padding: 16px;
+}
+
+.title-section,
+.description-section {
+  margin-bottom: 12px;
+}
+
+.editable-field {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin: -4px -8px;
+}
+
+.editable-field:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.editable-field.empty {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.spot-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+  color: #1f2937;
+  line-height: 1.3;
+}
+
+.spot-description {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #6b7280;
+  margin: 0;
+}
+
+.title-input,
+.description-input {
+  width: 100%;
+  border: 2px solid #3b82f6;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: inherit;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.title-input {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.description-input {
+  font-size: 1rem;
+  color: #6b7280;
+  resize: vertical;
+  min-height: 60px;
+}
+
+.title-input:focus,
+.description-input:focus {
+  border-color: #1d4ed8;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 </style>

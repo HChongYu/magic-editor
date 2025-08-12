@@ -16,7 +16,7 @@ export enum DiyNodeType {
 
 // 导出所有枚举的联合类型（可选）
 export type AllEnums = 
-  | TemplateNodeType
+  | TemplateNodeType | DiyNodeType
 
 // 枚举工具函数
 export class EnumUtils {
