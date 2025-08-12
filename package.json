@@ -22,7 +22,8 @@
     "@tiptap/starter-kit": "^3.0.9",
     "@tiptap/vue-3": "^3.0.9",
     "core-js": "^3.8.3",
-    "vue": "^3.2.13"
+    "vue": "^3.2.13",
+    "vue-router": "^4.5.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

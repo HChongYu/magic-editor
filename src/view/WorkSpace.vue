@@ -13,9 +13,6 @@
 
       <!-- 主内容区（优先加载） -->
       <div class="main">
-        <ProductHeader :product-name="productName" :product-description="productDescription"
-          :product-image="productImage" @name-change="handleProductNameChange"
-          @description-change="handleProductDescriptionChange" @image-change="handleProductImageChange" />
         <!-- 编辑器区域 -->
         <div class="editor-container">
           <TiptapEditor ref="tiptapEditor" :extensions="customExtensions" :initial-content="editorContent"
@@ -48,7 +45,6 @@
 import TiptapEditor from '../components/TiptapEditor'
 import LeftSidebar from '../components/LeftSidebar'
 import RightSidebar from '../components/RightSidebar'
-import ProductHeader from '../components/ProductHeader'
 import RichTextToolbarDemo from '../components/RichTextToolbarDemo'
 // 导入Tiptap扩展
 import StarterKit from '@tiptap/starter-kit'
@@ -75,8 +71,7 @@ export default {
     TiptapEditor,
     LeftSidebar,
     RightSidebar,
-    RichTextToolbarDemo,
-    ProductHeader,
+    RichTextToolbarDemo
   },
   data() {
     return {
