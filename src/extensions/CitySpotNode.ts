@@ -1,6 +1,6 @@
 import { Node, mergeAttributes } from '@tiptap/core'
 import { VueNodeViewRenderer } from '@tiptap/vue-3'
-import CitySpotView from '../components/CitySpotView.vue'
+import CitySpotView from '@/components/CitySpotView.vue'
 
 // 城市景点卡片节点属性类型定义
 interface CitySpotAttributes {
@@ -79,7 +79,7 @@ export const CitySpotNode = Node.create({
   },
 
   addNodeView() {
-    return VueNodeViewRenderer(CitySpotView)
+    return VueNodeViewRenderer(CitySpotView as any)
   },
 
   addCommands() {

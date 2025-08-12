@@ -16,8 +16,8 @@
     <!-- 分类标签 -->
     <div class="category-section">
       <div class="category-tags">
-        <span v-for="category in sidebarData.categories" :key="category.id"
-          :class="['category-tag', { active: category.active }]" @click="selectCategory(category)">
+        <span v-for="category in sidebarData.categories" :key="category.type"
+          :class="['category-tag', { active: activeType === category.type }]" @click="selectCategory(category.type)">
           {{ category.name }}
         </span>
       </div>
@@ -25,68 +25,12 @@
 
     <!-- 模版内容区 -->
     <div class="template-content">
-      <div class="content-header">
-        <h4 class="content-title">{{ sidebarData.contentInfo.title }}</h4>
-        <p class="content-subtitle">{{ sidebarData.contentInfo.subtitle }} - {{ totalTemplatesCount }}个</p>
-      </div>
 
-      <!-- 模版列表 -->
-      <div class="template-list">
-        <!-- 动态渲染各个模版区块 -->
-        <template v-for="section in sidebarData.templateSections" :key="section.id">
+      <div class="template-section" v-for="section in sidebarData.templateSections[activeType]" :key="section.type">
 
-          <!-- 行布局模版 -->
-          <div v-if="section.type === 'row'" class="template-row">
-            <div v-for="template in section.templates" :key="template.id" :class="['template-card', template.size]"
-              @click="insertTemplate(template)">
-              <!-- 图片卡片 -->
-              <div v-if="template.size !== 'text'" class="card-image">
-                <img :src="template.image" :alt="template.title" />
-                <div v-if="template.overlayText" class="card-overlay">
-                  <span class="overlay-text">{{ template.overlayText }}</span>
-                  <span class="overlay-subtext">{{ template.overlaySubtext }}</span>
-                </div>
-              </div>
+        {{ section.leftTitle }}
 
-              <!-- 文字卡片 -->
-              <div v-if="template.size === 'text'" class="text-content">
-                <span class="text-title">{{ template.title }}</span>
-                <span class="text-subtitle">{{ template.subtitle }}</span>
-              </div>
 
-              <!-- 卡片标签 -->
-              <div v-if="template.size !== 'text'" class="card-label">{{ template.title }}</div>
-            </div>
-          </div>
-
-          <!-- 大图模版 -->
-          <div v-else-if="section.type === 'large'" class="template-large"
-            @click="insertTemplate(section.templates[0])">
-            <div class="large-image">
-              <img :src="section.templates[0].image" :alt="section.templates[0].title" />
-              <div class="large-overlay">
-                <h5 class="large-title">{{ section.templates[0].title }}</h5>
-                <p class="large-description">{{ section.templates[0].description }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- 特色推荐 -->
-          <div v-else-if="section.type === 'featured'" class="featured-section">
-            <div v-for="template in section.templates" :key="template.id"
-              :class="['featured-item', { highlighted: template.highlighted }]" @click="insertTemplate(template)">
-              <div class="featured-avatar">
-                <img :src="template.avatar" :alt="template.title" />
-              </div>
-              <div class="featured-info">
-                <h6 class="featured-title">{{ template.title }}</h6>
-                <p class="featured-meta" v-if="template.rating">{{ template.rating }}</p>
-                <p class="featured-description" v-if="template.description">{{ template.description }}</p>
-              </div>
-            </div>
-          </div>
-
-        </template>
       </div>
     </div>
   </aside>
@@ -94,13 +38,15 @@
 
 <script>
 import sidebarData from '@/data/leftSidebarData.json'
+import { TemplateNodeType } from '@/enums'
 
 export default {
   name: 'TemplateLibrary',
   data() {
     return {
       searchQuery: '',
-      sidebarData: sidebarData
+      sidebarData: sidebarData,
+      activeType: TemplateNodeType.ALL,
     }
   },
   computed: {
@@ -128,10 +74,8 @@ export default {
   },
   methods: {
     selectCategory(category) {
-      // 重置所有分类的激活状态
-      this.sidebarData.categories.forEach(cat => cat.active = false)
       // 激活选中的分类
-      category.active = true
+      this.activeType = category;
       this.$emit('category-changed', category)
     },
 
@@ -285,300 +229,9 @@ export default {
   color: #6a737d;
 }
 
-/* 模版列表 */
-.template-list {
-  padding: 12px 16px 16px;
-}
-
-.template-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.template-card {
-  position: relative;
-  border-radius: 6px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: #ffffff;
-  border: 1px solid #e1e4e8;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-.template-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-color: #d1d5da;
-}
-
-.template-card.small {
-  flex: 1;
-  height: 90px;
-}
-
-.template-card.mini {
-  flex: 1;
-  height: 70px;
-}
-
-.card-image {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-.card-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.2s ease;
-}
-
-.template-card:hover .card-image img {
-  transform: scale(1.05);
-}
-
-.card-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.3));
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.template-card:hover .card-overlay {
-  opacity: 1;
-}
-
-.overlay-text {
-  font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 2px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-.overlay-subtext {
-  font-size: 10px;
-  opacity: 0.9;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-.card-label {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-  color: white;
-  font-size: 10px;
-  padding: 12px 6px 4px;
-  text-align: center;
-  font-weight: 500;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-/* 大图模版 */
-.template-large {
-  position: relative;
-  border-radius: 6px;
-  overflow: hidden;
-  cursor: pointer;
-  margin-bottom: 10px;
-  border: 1px solid #e1e4e8;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-.template-large:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-}
-
-.large-image {
-  position: relative;
-  width: 100%;
-  height: 120px;
-  overflow: hidden;
-}
-
-.large-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.2s ease;
-}
-
-.template-large:hover .large-image img {
-  transform: scale(1.05);
-}
-
-.large-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-  color: white;
-  padding: 20px 12px 10px;
-}
-
-.large-title {
-  margin: 0 0 4px 0;
-  font-size: 13px;
-  font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-.large-description {
-  margin: 0;
-  font-size: 10px;
-  opacity: 0.95;
-  line-height: 1.4;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-/* 文字卡片 */
-.template-card.text {
-  background: linear-gradient(135deg, #42a5f5, #1e88e5);
-  color: white;
-  padding: 12px;
-  min-height: 70px;
-  display: flex;
-  align-items: center;
-  border: none;
-  box-shadow: 0 2px 8px rgba(66, 165, 245, 0.3);
-}
-
-.template-card.text:hover {
-  background: linear-gradient(135deg, #1e88e5, #1565c0);
-  box-shadow: 0 4px 16px rgba(66, 165, 245, 0.4);
-}
-
-.text-content {
-  display: flex;
-  flex-direction: column;
-}
-
-.text-title {
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 3px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.text-subtitle {
-  font-size: 10px;
-  opacity: 0.9;
-  line-height: 1.3;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-/* 特色推荐 */
-.featured-section {
-  margin-top: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.featured-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 10px;
-  border-radius: 6px;
-  background: #f6f8fa;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: 1px solid #e1e4e8;
-}
-
-.featured-item:hover {
-  background: #e1f5fe;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.featured-item.highlighted {
-  background: #fff8e1;
-  border-color: #ffb300;
-}
-
-.featured-item.highlighted:hover {
-  background: #fff3c4;
-}
-
-.featured-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 6px;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.featured-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.featured-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.featured-title {
-  margin: 0 0 3px 0;
-  font-size: 12px;
-  font-weight: 600;
-  color: #24292e;
-  line-height: 1.3;
-}
-
-.featured-meta {
-  margin: 0 0 4px 0;
-  font-size: 10px;
-  color: #f57c00;
-  font-weight: 500;
-}
-
-.featured-description {
-  margin: 0;
-  font-size: 9px;
-  color: #6a737d;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* 滚动条样式 */
-.template-content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.template-content::-webkit-scrollbar-track {
-  background: #f6f8fa;
-}
-
-.template-content::-webkit-scrollbar-thumb {
-  background: #d1d5da;
-  border-radius: 3px;
-}
-
-.template-content::-webkit-scrollbar-thumb:hover {
-  background: #959da5;
+.template-section {
+  padding: 16px 12px;
+  border: 1px solid #586069;
+  margin: 10px 0;
 }
 </style>

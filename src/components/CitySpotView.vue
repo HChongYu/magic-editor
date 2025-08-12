@@ -78,11 +78,23 @@
   </node-view-wrapper>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, ref, nextTick, type PropType } from 'vue'
 import { NodeViewWrapper } from '@tiptap/vue-3'
+import type { Node } from '@tiptap/pm/model'
+import type { Editor } from '@tiptap/core'
 import CitySpotSettings from './CitySpotSettings.vue'
 
-export default {
+interface CitySpotNodeAttrs {
+  imageUrl: string
+  title: string
+  description: string
+  qrCode?: string
+  backgroundColor: string
+  borderColor: string
+}
+
+export default defineComponent({
   name: 'CitySpotView',
   components: {
     NodeViewWrapper,
@@ -90,109 +102,132 @@ export default {
   },
   props: {
     node: {
-      type: Object,
+      type: Object as PropType<Node>,
       required: true,
     },
     updateAttributes: {
-      type: Function,
+      type: Function as PropType<(attributes: Partial<CitySpotNodeAttrs>) => void>,
       required: true,
     },
     editor: {
-      type: Object,
+      type: Object as PropType<Editor>,
       required: true,
     },
     getPos: {
-      type: Function,
+      type: Function as PropType<() => number>,
       required: true,
     },
     deleteNode: {
-      type: Function,
-      required: false,
+      type: Function as PropType<() => void>,
+      required: true,
     },
     selected: {
       type: Boolean,
       default: false,
     },
   },
-  data() {
-    return {
-      showToolbar: false,
-      editingTitle: false,
-      editingDescription: false,
-      tempTitle: '',
-      tempDescription: '',
+  setup(props) {
+    const showToolbar = ref(false)
+    const editingTitle = ref(false)
+    const editingDescription = ref(false)
+    const tempTitle = ref('')
+    const tempDescription = ref('')
+    const fileInput = ref<HTMLInputElement>()
+    const titleInput = ref<HTMLInputElement>()
+    const descriptionInput = ref<HTMLTextAreaElement>()
+
+    const handleImageClick = () => {
+      fileInput.value?.click()
     }
-  },
-  methods: {
-    handleImageClick() {
-      this.$refs.fileInput.click()
-    },
     
-    handleFileChange(event) {
-      const file = event.target.files[0]
+    const handleFileChange = (event: Event) => {
+      const target = event.target as HTMLInputElement
+      const file = target.files?.[0]
       if (file) {
         const reader = new FileReader()
         reader.onload = (e) => {
-          this.updateAttributes({
-            imageUrl: e.target.result
+          props.updateAttributes({
+            imageUrl: e.target?.result as string
           })
         }
         reader.readAsDataURL(file)
       }
-    },
+    }
     
-    handleImageError(event) {
-      event.target.src = 'https://via.placeholder.com/600x400?text=Image+Not+Found'
-    },
+    const handleImageError = (event: Event) => {
+      const target = event.target as HTMLImageElement
+      target.src = 'https://via.placeholder.com/600x400?text=Image+Not+Found'
+    }
     
-    handleImageChange(imageUrl) {
-      this.updateAttributes({ imageUrl })
-    },
+    const handleImageChange = (imageUrl: string) => {
+      props.updateAttributes({ imageUrl })
+    }
     
-    editTitle() {
-      this.editingTitle = true
-      this.tempTitle = this.node.attrs.title
-      this.$nextTick(() => {
-        this.$refs.titleInput?.focus()
+    const editTitle = () => {
+      editingTitle.value = true
+      tempTitle.value = props.node.attrs.title
+      nextTick(() => {
+        titleInput.value?.focus()
       })
-    },
+    }
     
-    saveTitle() {
-      if (this.tempTitle.trim()) {
-        this.updateAttributes({ title: this.tempTitle.trim() })
+    const saveTitle = () => {
+      if (tempTitle.value.trim()) {
+        props.updateAttributes({ title: tempTitle.value.trim() })
       }
-      this.editingTitle = false
-    },
+      editingTitle.value = false
+    }
     
-    editDescription() {
-      this.editingDescription = true
-      this.tempDescription = this.node.attrs.description
-      this.$nextTick(() => {
-        this.$refs.descriptionInput?.focus()
+    const editDescription = () => {
+      editingDescription.value = true
+      tempDescription.value = props.node.attrs.description
+      nextTick(() => {
+        descriptionInput.value?.focus()
       })
-    },
+    }
     
-    saveDescription() {
-      if (this.tempDescription.trim()) {
-        this.updateAttributes({ description: this.tempDescription.trim() })
+    const saveDescription = () => {
+      if (tempDescription.value.trim()) {
+        props.updateAttributes({ description: tempDescription.value.trim() })
       }
-      this.editingDescription = false
-    },
+      editingDescription.value = false
+    }
     
-    cancelEdit() {
-      this.editingTitle = false
-      this.editingDescription = false
-      this.tempTitle = ''
-      this.tempDescription = ''
-    },
+    const cancelEdit = () => {
+      editingTitle.value = false
+      editingDescription.value = false
+      tempTitle.value = ''
+      tempDescription.value = ''
+    }
     
-    handleDelete() {
-      if (this.deleteNode) {
-        this.deleteNode()
+    const handleDelete = () => {
+      if (props.deleteNode) {
+        props.deleteNode()
       }
-    },
+    }
+
+    return {
+      showToolbar,
+      editingTitle,
+      editingDescription,
+      tempTitle,
+      tempDescription,
+      fileInput,
+      titleInput,
+      descriptionInput,
+      handleImageClick,
+      handleFileChange,
+      handleImageError,
+      handleImageChange,
+      editTitle,
+      saveTitle,
+      editDescription,
+      saveDescription,
+      cancelEdit,
+      handleDelete,
+    }
   },
-}
+})
 </script>
 
 <style scoped>

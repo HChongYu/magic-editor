@@ -8,9 +8,6 @@
 import { Editor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import { Extension } from '@tiptap/core'
-import { EmojiNode, EMOJI_DATA } from '@/extensions/EmojiNode'
-import { DoubleTextNode } from '@/extensions/DoubleTextNode'
-import TextBlockNode from '@/extensions/TextBlockNode'
 
 // 导入扩展
 import BulletList from '@tiptap/extension-bullet-list'
@@ -143,6 +140,18 @@ export default {
                 { value: '#17a2b8', label: '青色' },
                 { value: '#6c757d', label: '深灰色' },
                 { value: '#fff', label: '白色' },
+            ],
+            baseExtensions: [
+                StarterKit.configure({
+                    bulletList: false,
+                    heading: false,
+                    paragraph: false,
+                    blockquote: false,
+                }),
+                BulletList,
+                Heading,
+                Paragraph,
+                Blockquote,
             ]
         }
     },
@@ -160,7 +169,7 @@ export default {
         initEditor() {
             const extensionsToUse = this.getExtensions()
             const content = this.initialContent || this.getDefaultContent()
-            
+
             this.editor = new Editor({
                 content,
                 extensions: extensionsToUse,
@@ -188,39 +197,16 @@ export default {
                     this.$emit('editor-ready', editor)
                 }
             })
-            
+
             // 添加键盘快捷键监听
             this.addKeyboardListeners()
         },
 
         // 获取要使用的扩展
         getExtensions() {
-            if (this.extensions && this.extensions.length > 0) {
-                return this.extensions
-            }
-            return this.getDefaultExtensions()
+            return [...this.baseExtensions,...this.extensions]
         },
 
-        // 获取默认扩展
-        getDefaultExtensions() {
-            return [
-                StarterKit.configure({
-                    bulletList: false,
-                    heading: false,
-                    paragraph: false,
-                    blockquote: false,
-                }),
-                CustomBulletList,
-                CustomHeading,
-                CustomParagraph,
-                CustomBlockquote,
-                CustomExtension,
-                TextAlign,
-                EmojiNode,
-                DoubleTextNode,
-                TextBlockNode,
-            ]
-        },
 
         // 获取默认内容
         getDefaultContent() {
@@ -250,22 +236,22 @@ export default {
         // 保存当前光标位置
         saveCurrentCursorPosition(editorInstance) {
             if (!editorInstance) return
-            
+
             const { selection } = editorInstance.state
             const { from, to } = selection
-            
+
             this.savedSelection = { from, to }
-            
+
             const doc = editorInstance.state.doc
             const pos = selection.$anchor.pos
-            
+
             let line = 1
             let column = 1
             let currentPos = 0
-            
+
             doc.descendants((node, nodePos) => {
                 if (currentPos >= pos) return false
-                
+
                 if (node.isText) {
                     const text = node.text || ''
                     for (let i = 0; i < text.length && currentPos < pos; i++) {
@@ -283,16 +269,16 @@ export default {
                         column = 1
                     }
                 }
-                
+
                 return currentPos < pos
             })
-            
+
             this.lastCursorPosition = {
                 line,
                 column,
                 absolutePosition: pos
             }
-            
+
             console.log('保存光标位置:', this.lastCursorPosition)
         },
 
@@ -333,12 +319,12 @@ export default {
 
         restoreLastPosition() {
             if (!this.editor || !this.savedSelection) return
-            
+
             this.editor.chain()
                 .focus()
                 .setTextSelection(this.savedSelection)
                 .run()
-            
+
             console.log('恢复到位置:', this.savedSelection)
         },
 
@@ -405,15 +391,15 @@ export default {
             const { selection } = this.editor.state
             const { $from } = selection
             const node = $from.node()
-            
+
             if (node.type.name === 'doubleTextNode' || node.type.name === 'textBlock') {
                 return
             }
 
             this.editor.chain().focus().insertContent({
                 type: 'doubleTextNode',
-                attrs: { 
-                    topColor: '#e53e3e', 
+                attrs: {
+                    topColor: '#e53e3e',
                     bottomColor: '#3182ce',
                     topText: '上段文字',
                     bottomText: '下段文字',
@@ -446,18 +432,18 @@ export default {
 
         toggleDoubleTextStyle(which, styleType, value) {
             if (!this.editor) return
-            
+
             const attrs = this.editor.getAttributes('doubleTextNode')
-            const attrName = which === 'top' ? 
-                (styleType === 'fontWeight' ? 'topFontWeight' : 
-                 styleType === 'fontStyle' ? 'topFontStyle' : 'topTextDecoration') :
-                (styleType === 'fontWeight' ? 'bottomFontWeight' : 
-                 styleType === 'fontStyle' ? 'bottomFontStyle' : 'bottomTextDecoration')
-            
+            const attrName = which === 'top' ?
+                (styleType === 'fontWeight' ? 'topFontWeight' :
+                    styleType === 'fontStyle' ? 'topFontStyle' : 'topTextDecoration') :
+                (styleType === 'fontWeight' ? 'bottomFontWeight' :
+                    styleType === 'fontStyle' ? 'bottomFontStyle' : 'bottomTextDecoration')
+
             const currentValue = attrs[attrName]
-            const newValue = currentValue === value ? 
+            const newValue = currentValue === value ?
                 (styleType === 'textDecoration' ? 'none' : 'normal') : value
-            
+
             this.editor.chain().focus().setDoubleTextStyle(which, styleType, newValue).run()
         },
 
@@ -468,12 +454,12 @@ export default {
 
         editDoubleTextContent(which) {
             if (!this.editor) return
-            
+
             const { state } = this.editor
             const { selection, doc } = state
             let found = false
             let node = null
-            
+
             doc.nodesBetween(selection.from, selection.to, (n) => {
                 if (n.type.name === 'doubleTextNode') {
                     node = n
@@ -481,7 +467,7 @@ export default {
                     return false
                 }
             })
-            
+
             if (!found) {
                 const resolvedPos = doc.resolve(selection.from)
                 for (let depth = resolvedPos.depth; depth > 0; depth--) {
@@ -493,7 +479,7 @@ export default {
                     }
                 }
             }
-            
+
             if (found && node) {
                 let currentText = ''
                 if (which === 'top' && node.content.content[0]) {
@@ -503,9 +489,9 @@ export default {
                 } else {
                     currentText = which === 'top' ? node.attrs.topText : node.attrs.bottomText
                 }
-                
+
                 const newText = prompt(`请输入${which === 'top' ? '上' : '下'}段文字:`, currentText)
-                
+
                 if (newText !== null) {
                     this.editor.chain().focus().setDoubleTextContent(which, newText).run()
                 }
@@ -536,18 +522,18 @@ export default {
 
         copySelectedNode() {
             if (!this.editor) return
-            
+
             const { state } = this.editor
             const { selection, doc } = state
             let nodeInfo = null
-            
+
             doc.nodesBetween(selection.from, selection.to, (node, pos) => {
                 if (node.type.name === 'doubleTextNode' || node.type.name === 'emojiNode') {
                     nodeInfo = { node, pos }
                     return false
                 }
             })
-            
+
             if (!nodeInfo) {
                 const resolvedPos = doc.resolve(selection.from)
                 for (let depth = resolvedPos.depth; depth > 0; depth--) {
@@ -559,13 +545,13 @@ export default {
                     }
                 }
             }
-            
+
             if (nodeInfo) {
                 const { tr } = state
                 const insertPos = selection.to
                 tr.insert(insertPos, nodeInfo.node.copy())
                 this.editor.view.dispatch(tr)
-                
+
                 console.log('节点已复制:', nodeInfo.node.type.name)
             } else {
                 alert('请先选中一个节点（双文本节点或表情符号）')
@@ -574,18 +560,18 @@ export default {
 
         deleteSelectedNode() {
             if (!this.editor) return
-            
+
             const { state } = this.editor
             const { selection, doc } = state
             let nodeInfo = null
-            
+
             doc.nodesBetween(selection.from, selection.to, (node, pos) => {
                 if (node.type.name === 'doubleTextNode' || node.type.name === 'emojiNode') {
                     nodeInfo = { node, pos, size: node.nodeSize }
                     return false
                 }
             })
-            
+
             if (!nodeInfo) {
                 const resolvedPos = doc.resolve(selection.from)
                 for (let depth = resolvedPos.depth; depth > 0; depth--) {
@@ -597,14 +583,14 @@ export default {
                     }
                 }
             }
-            
+
             if (nodeInfo) {
                 const nodeTypeName = nodeInfo.node.type.name === 'doubleTextNode' ? '双文本节点' : '表情符号'
                 if (confirm(`确定要删除这个${nodeTypeName}吗？`)) {
                     const { tr } = state
                     tr.delete(nodeInfo.pos, nodeInfo.pos + nodeInfo.size)
                     this.editor.view.dispatch(tr)
-                    
+
                     console.log('节点已删除:', nodeInfo.node.type.name)
                 }
             } else {
@@ -619,19 +605,19 @@ export default {
                     this.copySelectedNode()
                     return
                 }
-                
+
                 if (event.key === 'Delete') {
                     const { state } = this.editor
                     const { selection, doc } = state
                     let hasCustomNode = false
-                    
+
                     doc.nodesBetween(selection.from, selection.to, (node) => {
                         if (node.type.name === 'doubleTextNode' || node.type.name === 'emojiNode') {
                             hasCustomNode = true
                             return false
                         }
                     })
-                    
+
                     if (!hasCustomNode) {
                         const resolvedPos = doc.resolve(selection.from)
                         for (let depth = resolvedPos.depth; depth > 0; depth--) {
@@ -642,14 +628,14 @@ export default {
                             }
                         }
                     }
-                    
+
                     if (hasCustomNode) {
                         event.preventDefault()
                         this.deleteSelectedNode()
                     }
                 }
             }
-            
+
             document.addEventListener('keydown', this.keyboardHandler)
         },
 
@@ -665,61 +651,61 @@ export default {
 
 <style scoped>
 .tiptap-editor {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
 /* 光标位置指示器样式 */
 .cursor-position-indicator {
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
-  border-radius: 6px;
-  padding: 12px 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .position-info {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 }
 
 .position-text {
-  color: #495057;
-  font-size: 14px;
-  font-weight: 500;
+    color: #495057;
+    font-size: 14px;
+    font-weight: 500;
 }
 
 .restore-btn {
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 6px 12px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: background-color 0.2s;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
 
 .restore-btn:hover {
-  background: #0056b3;
+    background: #0056b3;
 }
 
 /* 编辑器失去焦点时的视觉提示 */
 :deep(.ProseMirror) {
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  padding: 12px;
-  min-height: 200px;
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 12px;
+    min-height: 200px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .tiptap-editor:has(.ProseMirror:focus) :deep(.ProseMirror) {
-  border-color: #007bff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 </style>

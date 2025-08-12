@@ -1,152 +1,26 @@
 {
-  "categories": [
-    { "id": 1, "name": "青春", "active": true },
-    { "id": 2, "name": "蓝色", "active": false },
-    { "id": 3, "name": "商务简约", "active": false },
-    { "id": 4, "name": "活动", "active": false },
-    { "id": 5, "name": "科技", "active": false },
-    { "id": 6, "name": "文艺", "active": false }
-  ],
-  "templateSections": [
-    {
-      "id": "section1",
-      "type": "row",
-      "title": "双图模版1",
-      "templates": [
+    "categories": [
         {
-          "id": 1,
-          "title": "清水寺",
-          "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=150&h=100&fit=crop",
-          "overlayText": "GAME",
-          "overlaySubtext": "50%",
-          "type": "image_card",
-          "size": "small"
+            "name": "推荐",
+            "type": "all"
         },
         {
-          "id": 2,
-          "title": "清水寺",
-          "image": "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=150&h=100&fit=crop",
-          "overlayText": "GAME",
-          "overlaySubtext": "50%",
-          "type": "image_card",
-          "size": "small"
+            "name": "图文",
+            "type": "imageText"
         }
-      ]
-    },
-    {
-      "id": "section2",
-      "type": "large",
-      "title": "大图模版",
-      "templates": [
-        {
-          "id": "large1",
-          "title": "涉谷十字路口",
-          "description": "世界最繁忙、最知名的路口，出现在无数电影、电视剧和广告中",
-          "image": "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=300&h=200&fit=crop",
-          "type": "header",
-          "size": "large"
-        }
-      ]
-    },
-    {
-      "id": "section3",
-      "type": "row",
-      "title": "三图模版",
-      "templates": [
-        {
-          "id": "mini1",
-          "title": "奈良鹿公园",
-          "image": "https://images.unsplash.com/photo-1480796927426-f609979314bd?w=100&h=80&fit=crop",
-          "type": "image_card",
-          "size": "mini"
-        },
-        {
-          "id": "mini2",
-          "title": "京都一心寺",
-          "image": "https://images.unsplash.com/photo-1528164344705-47542687000d?w=100&h=80&fit=crop",
-          "type": "image_card",
-          "size": "mini"
-        },
-        {
-          "id": "mini3",
-          "title": "富士山河口湖",
-          "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=100&h=80&fit=crop",
-          "type": "image_card",
-          "size": "mini"
-        }
-      ]
-    },
-    {
-      "id": "section4",
-      "type": "row",
-      "title": "双图模版2",
-      "templates": [
-        {
-          "id": 3,
-          "title": "清水寺庭园",
-          "image": "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=100&h=80&fit=crop",
-          "type": "image_card",
-          "size": "small"
-        },
-        {
-          "id": 4,
-          "title": "京都一心寺",
-          "image": "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=100&h=80&fit=crop",
-          "type": "image_card",
-          "size": "small"
-        }
-      ]
-    },
-    {
-      "id": "section5",
-      "type": "row",
-      "title": "文字卡片",
-      "templates": [
-        {
-          "id": "text1",
-          "title": "日本",
-          "subtitle": "本州岛关东地区核心城市",
-          "type": "text_card",
-          "size": "text"
-        },
-        {
-          "id": "text2",
-          "title": "青森",
-          "subtitle": "本州岛最北端的县",
-          "type": "text_card",
-          "size": "text"
-        }
-      ]
-    },
-    {
-      "id": "section6",
-      "type": "featured",
-      "title": "特色推荐",
-      "templates": [
-        {
-          "id": "featured1",
-          "title": "冲绳十字海口",
-          "rating": "★★★ 冲绳县",
-          "avatar": "https://images.unsplash.com/photo-1513407030348-c983a97b98d8?w=60&h=60&fit=crop",
-          "highlighted": false,
-          "type": "featured",
-          "size": "featured"
-        },
-        {
-          "id": "featured2",
-          "title": "富士山口湖温泉乡",
-          "rating": "5.0分",
-          "description": "位于富士山脚下的温泉度假村，可以欣赏到富士山的绝美景色，是放松身心的绝佳去处。",
-          "avatar": "https://images.unsplash.com/photo-1528164344705-47542687000d?w=60&h=60&fit=crop",
-          "highlighted": true,
-          "type": "featured",
-          "size": "featured"
-        }
-      ]
+    ],
+    "templateSections": {
+        "imageText": [
+            {
+                "type": "largeImageText1",
+                "leftTitle": "单个大图文",
+                "config": {
+                    "title": "涉谷十字路口",
+                    "description": "世界最繁忙、最知名的路口，出现在无数电影、电视剧和广告中",
+                    "image": "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=300&h=200&fit=crop",
+                    "size": "large"
+                }
+            }
+        ]
     }
-  ],
-  "contentInfo": {
-    "title": "沿途风景",
-    "subtitle": "精选高质量模版"
-  }
 }

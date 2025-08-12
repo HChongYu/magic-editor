@@ -6,19 +6,13 @@
 // 编辑器相关枚举 
 // 模版节点类型
 export enum TemplateNodeType {
-  HEADER = 'header',
-  IMAGE_CARD = 'imageCard',
-  WECHAT_STYLE = 'weChatStyle'  // 新增微信风格类型
+  ALL = 'all',
+  IMAGE_TEXT = 'imageText',
 }
 
-
-
-
-
-
-
-
-
+export enum DiyNodeType {
+  LARGE_IMAGE_TEXT1 = 'largeImageText1',
+}
 
 // 导出所有枚举的联合类型（可选）
 export type AllEnums = 

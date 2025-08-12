@@ -1,35 +1,20 @@
 <template>
   <div class="workspace-layout">
     <!-- 左侧边栏组件 -->
-    <LeftSidebar 
-      @template-selected="insertTemplate"
-      @category-changed="onCategoryChanged"
-    />
+    <LeftSidebar @template-selected="insertTemplate" @category-changed="onCategoryChanged" />
 
     <!-- 主内容区 -->
     <main class="main-content">
       <div class="editor-container">
-        <TiptapEditor 
-          ref="tiptapEditor" 
-          :extensions="customExtensions" 
-          :initial-content="editorContent"
-          :show-toolbar="showEditorToolbar" 
-          @editor-ready="onEditorReady" 
-          @update="onEditorUpdate"
-          @selection-update="onSelectionUpdate" 
-        />
+        <TiptapEditor ref="tiptapEditor" extensions="customExtensions" :initial-content="editorContent"
+          :show-toolbar="showEditorToolbar" @editor-ready="onEditorReady" @update="onEditorUpdate"
+          @selection-update="onSelectionUpdate" />
       </div>
     </main>
 
     <!-- 右侧边栏组件 -->
-    <ControlPanel 
-      @toolbar-toggle="onToolbarToggle"
-      @tab-changed="onTabChanged"
-      @preview-generated="onPreviewGenerated"
-      @open-settings="onOpenSettings"
-      @setting-changed="onSettingChanged"
-      @privacy-changed="onPrivacyChanged"
-    />
+    <ControlPanel @toolbar-toggle="onToolbarToggle" @tab-changed="onTabChanged" @preview-generated="onPreviewGenerated"
+      @open-settings="onOpenSettings" @setting-changed="onSettingChanged" @privacy-changed="onPrivacyChanged" />
   </div>
 </template>
 
@@ -38,21 +23,9 @@ import TiptapEditor from '@/components/TiptapEditor'
 import LeftSidebar from '@/components/LeftSidebar'
 import ControlPanel from '../components/RightSidebar/ControlPanel.vue'
 
-// 导入Tiptap扩展
-import StarterKit from '@tiptap/starter-kit'
-import { EmojiNode } from '@/extensions/EmojiNode'
-import { DoubleTextNode } from '@/extensions/DoubleTextNode'
-import TextBlockNode from '@/extensions/TextBlockNode'
-import TravelCardNode from '@/extensions/TravelCardNode'
-import ImageTextListNode from '@/extensions/ImageTextListNode'
-import { RichTravelCardNode } from '@/extensions/RichTravelCardNode'
-import {
-  RichCardTitleNode,
-  RichCardSubtitleNode,
-  RichCardPriceNode,
-  RichCardUnitNode,
-  RichCardLinkNode
-} from '@/extensions/RichCardNodes'
+// 导入自定义节点扩展
+import CitySpotNode from '@/extensions/CitySpotNode'
+
 import { TemplateNodeType } from '@/enums'
 
 export default {
@@ -69,20 +42,8 @@ export default {
       showEditorToolbar: true,
       editorContent: '',
       editorHTML: '',
-      // 自定义扩展配置
       customExtensions: [
-        StarterKit,
-        EmojiNode,
-        DoubleTextNode,
-        TextBlockNode,
-        TravelCardNode,
-        ImageTextListNode,
-        RichTravelCardNode,
-        RichCardTitleNode,
-        RichCardSubtitleNode,
-        RichCardPriceNode,
-        RichCardUnitNode,
-        RichCardLinkNode
+        CitySpotNode
       ]
     }
   },
@@ -98,36 +59,6 @@ export default {
 
       if (templateData.type === TemplateNodeType.IMAGE_CARD || templateData.type === 'image_card') {
         this.editorInstance.chain().focus().insertRichTravelCard().run()
-      } else if (templateData.type === TemplateNodeType.HEADER || templateData.type === 'header') {
-        this.editorInstance.chain().focus().insertContent({
-          type: 'doubleTextNode',
-          attrs: {
-            topColor: '#e53e3e',
-            bottomColor: '#3182ce',
-            topText: '上段文字',
-            bottomText: '下段文字',
-            topFontSize: '16px',
-            bottomFontSize: '14px',
-            topFontWeight: 'normal',
-            bottomFontWeight: 'normal',
-            topFontStyle: 'normal',
-            bottomFontStyle: 'normal',
-            topTextDecoration: 'none',
-            bottomTextDecoration: 'none'
-          },
-          content: [
-            {
-              type: 'textBlock',
-              content: [{ type: 'text', text: '上段文字' }]
-            },
-            {
-              type: 'textBlock',
-              content: [{ type: 'text', text: '下段文字' }]
-            }
-          ]
-        }).run()
-      } else if (templateData.type === TemplateNodeType.WECHAT_STYLE) {
-        this.editorInstance.chain().focus().insertImageTextList().run()
       }
     },
 
@@ -209,7 +140,7 @@ export default {
   .workspace-layout {
     flex-direction: column;
   }
-  
+
   .main-content {
     flex: 1;
     min-height: 400px;
