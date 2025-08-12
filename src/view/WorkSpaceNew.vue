@@ -41,9 +41,7 @@ import ControlPanel from '../components/RightSidebar/ControlPanel.vue'
 
 // 导入自定义节点扩展
 import CitySpotNode from '@/extensions/CitySpotNode'
-// Change this line:
-// To this:
-import { SimpleHeading } from '@/extensions/SimpleHeading'
+import SimpleHeading from '@/extensions/SimpleHeading'
 
 import { TemplateNodeType } from '@/enums'
 

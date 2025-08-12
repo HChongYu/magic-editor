@@ -23,18 +23,18 @@ declare module '@tiptap/core' {
   }
 }
 
-export const CitySpotNode = Node.create({
+const CitySpotNode = Node.create({
   name: 'citySpotNode',
-  
+
   group: 'block',
-  
+
   defining: true,
-  
+
   draggable: true,
 
   selectable: true,
 
-
+  content: 'simpleHeading',
 
   addAttributes() {
     return {
@@ -56,14 +56,6 @@ export const CitySpotNode = Node.create({
     ]
   },
 
-  renderHTML({ HTMLAttributes }) {
-    return [
-      'div',
-      mergeAttributes(HTMLAttributes, { 'data-type': 'city-spot' }),
-      0,
-    ]
-  },
-
   addNodeView() {
     return VueNodeViewRenderer(CitySpotView as any)
   },
@@ -72,22 +64,32 @@ export const CitySpotNode = Node.create({
     return {
       insertCitySpot:
         (attributes = {}) =>
-        ({ commands }) => {
-          return commands.insertContent({
-            type: this.name,
-            attrs: attributes,
-          })
-        },
+          ({ commands }) => {
+            return commands.insertContent({
+              type: this.name,
+              attrs: {
+                imageUrl: attributes.imageUrl || 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=600&h=400&fit=crop',
+              },
+              content: [
+                {
+                  type: 'simpleHeading',
+                  attrs: {
+                    text: attributes.title || '城市景点',
+                  },
+                }
+              ],
+            })
+          },
       updateCitySpot:
         (attributes) =>
-        ({ commands }) => {
-          return commands.updateAttributes(this.name, attributes)
-        },
+          ({ commands }) => {
+            return commands.updateAttributes(this.name, attributes)
+          },
       setCitySpotImage:
         (imageUrl) =>
-        ({ commands }) => {
-          return commands.updateAttributes(this.name, { imageUrl })
-        },
+          ({ commands }) => {
+            return commands.updateAttributes(this.name, { imageUrl })
+          },
     }
   },
 })

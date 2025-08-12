@@ -1,6 +1,31 @@
 <template>
     <div class="tiptap-editor">
         <editor-content :editor="editor" />
+
+        <!-- 添加BubbleMenu组件 -->
+        <template v-if="editor">
+            <bubble-menu :editor="editor" :tippy-options="{ duration: 100 }" :should-show="shouldShowBubbleMenu">
+                <div class="bubble-menu">
+                    <button @click="editor.chain().focus().toggleBold().run()"
+                        :class="{ 'is-active': editor.isActive('bold') }">
+                        粗体
+                    </button>
+                    <button @click="editor.chain().focus().toggleItalic().run()"
+                        :class="{ 'is-active': editor.isActive('italic') }">
+                        斜体
+                    </button>
+                    <template v-if="editor.isActive('heading')">
+                        <button @click="decreaseHeadingLevel()" :disabled="!canDecreaseHeadingLevel()">
+                            H-
+                        </button>
+                        <span>H{{ getCurrentHeadingLevel() }}</span>
+                        <button @click="increaseHeadingLevel()" :disabled="!canIncreaseHeadingLevel()">
+                            H+
+                        </button>
+                    </template>
+                </div>
+            </bubble-menu>
+        </template>
     </div>
 </template>
 
@@ -8,6 +33,7 @@
 import { Editor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import { Extension } from '@tiptap/core'
+import { BubbleMenu } from '@tiptap/extension-bubble-menu'
 
 // 导入扩展
 import BulletList from '@tiptap/extension-bullet-list'
@@ -104,7 +130,8 @@ const TextAlign = Extension.create({
 export default {
     name: 'TiptapEditor',
     components: {
-        EditorContent
+        EditorContent,
+        BubbleMenu,
     },
     props: {
         extensions: {
@@ -152,6 +179,9 @@ export default {
                 Heading,
                 Paragraph,
                 Blockquote,
+                BubbleMenu.configure({
+                    element: null, // 我们使用Vue组件，所以这里设为null
+                }),
             ]
         }
     },
@@ -204,7 +234,7 @@ export default {
 
         // 获取要使用的扩展
         getExtensions() {
-            return [...this.baseExtensions,...this.extensions]
+            return [...this.baseExtensions, ...this.extensions]
         },
 
 
@@ -690,5 +720,43 @@ export default {
 .tiptap-editor:has(.ProseMirror:focus) :deep(.ProseMirror) {
     border-color: #007bff;
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.bubble-menu {
+    display: flex;
+    background-color: #0D0D0D;
+    padding: 0.2rem;
+    border-radius: 0.5rem;
+}
+
+.bubble-menu button {
+    border: none;
+    background: none;
+    color: #FFF;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.2rem 0.4rem;
+    margin: 0 0.2rem;
+    border-radius: 0.3rem;
+    cursor: pointer;
+}
+
+.bubble-menu button:hover {
+    background-color: #2D2D2D;
+}
+
+.bubble-menu button.is-active {
+    background-color: #1F1F1F;
+}
+
+.bubble-menu button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.bubble-menu span {
+    color: #FFF;
+    font-size: 0.85rem;
+    padding: 0.2rem 0.4rem;
 }
 </style>
