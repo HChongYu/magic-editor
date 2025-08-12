@@ -4,39 +4,6 @@
       <div class="nav-brand">
         <h2>Tiptap Project</h2>
       </div>
-      
-      <div class="nav-links">
-        <router-link 
-          v-for="route in mainRoutes" 
-          :key="route.name"
-          :to="route.path"
-          class="nav-link"
-          active-class="active"
-        >
-          <span class="nav-icon">{{ route.meta.icon }}</span>
-          <span class="nav-text">{{ route.meta.title }}</span>
-        </router-link>
-        
-        <!-- 下拉菜单示例 -->
-        <div class="nav-dropdown" @mouseenter="showDropdown = true" @mouseleave="showDropdown = false">
-          <div class="nav-link dropdown-trigger">
-            <span class="nav-icon">🧩</span>
-            <span class="nav-text">组件</span>
-            <span class="dropdown-arrow">▼</span>
-          </div>
-          <div class="dropdown-menu" v-show="showDropdown">
-            <router-link 
-              v-for="component in componentRoutes" 
-              :key="component.name"
-              :to="component.path"
-              class="dropdown-item"
-            >
-              <span class="nav-icon">{{ component.meta.icon }}</span>
-              <span class="nav-text">{{ component.meta.title }}</span>
-            </router-link>
-          </div>
-        </div>
-      </div>
     </nav>
     
     <main class="app-main">

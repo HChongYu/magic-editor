@@ -1,21 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import WorkSpace from '@/view/WorkSpace.vue'
-
 // 路由配置
 const routes = [
   {
     path: '/',
     name: 'Home',
     redirect: '/Editor'
-  },
-  {
-    path: '/workspace',
-    name: 'WorkSpace',
-    component: WorkSpace,
-    meta: {
-      title: '工作区',
-      icon: '🏠'
-    }
   },
   {
     path: '/editor',

@@ -4,54 +4,41 @@
     <div class="library-header">
       <h3 class="library-title">模版库</h3>
     </div>
-    
+
     <!-- 搜索区域 -->
     <div class="search-section">
       <div class="search-wrapper">
-        <input 
-          type="text" 
-          placeholder="搜索模版或素材" 
-          class="search-input"
-          v-model="searchQuery"
-        >
+        <input type="text" placeholder="搜索模版或素材" class="search-input" v-model="searchQuery">
         <i class="search-icon">🔍</i>
       </div>
     </div>
-    
+
     <!-- 分类标签 -->
     <div class="category-section">
       <div class="category-tags">
-        <span 
-          v-for="category in sidebarData.categories" 
-          :key="category.id"
-          :class="['category-tag', { active: category.active }]"
-          @click="selectCategory(category)"
-        >
+        <span v-for="category in sidebarData.categories" :key="category.id"
+          :class="['category-tag', { active: category.active }]" @click="selectCategory(category)">
           {{ category.name }}
         </span>
       </div>
     </div>
-    
+
     <!-- 模版内容区 -->
     <div class="template-content">
       <div class="content-header">
         <h4 class="content-title">{{ sidebarData.contentInfo.title }}</h4>
         <p class="content-subtitle">{{ sidebarData.contentInfo.subtitle }} - {{ totalTemplatesCount }}个</p>
       </div>
-      
+
       <!-- 模版列表 -->
       <div class="template-list">
         <!-- 动态渲染各个模版区块 -->
         <template v-for="section in sidebarData.templateSections" :key="section.id">
-          
+
           <!-- 行布局模版 -->
           <div v-if="section.type === 'row'" class="template-row">
-            <div 
-              v-for="template in section.templates"
-              :key="template.id"
-              :class="['template-card', template.size]"
-              @click="insertTemplate(template)"
-            >
+            <div v-for="template in section.templates" :key="template.id" :class="['template-card', template.size]"
+              @click="insertTemplate(template)">
               <!-- 图片卡片 -->
               <div v-if="template.size !== 'text'" class="card-image">
                 <img :src="template.image" :alt="template.title" />
@@ -60,20 +47,21 @@
                   <span class="overlay-subtext">{{ template.overlaySubtext }}</span>
                 </div>
               </div>
-              
+
               <!-- 文字卡片 -->
               <div v-if="template.size === 'text'" class="text-content">
                 <span class="text-title">{{ template.title }}</span>
                 <span class="text-subtitle">{{ template.subtitle }}</span>
               </div>
-              
+
               <!-- 卡片标签 -->
               <div v-if="template.size !== 'text'" class="card-label">{{ template.title }}</div>
             </div>
           </div>
-          
+
           <!-- 大图模版 -->
-          <div v-else-if="section.type === 'large'" class="template-large" @click="insertTemplate(section.templates[0])">
+          <div v-else-if="section.type === 'large'" class="template-large"
+            @click="insertTemplate(section.templates[0])">
             <div class="large-image">
               <img :src="section.templates[0].image" :alt="section.templates[0].title" />
               <div class="large-overlay">
@@ -82,15 +70,11 @@
               </div>
             </div>
           </div>
-          
+
           <!-- 特色推荐 -->
           <div v-else-if="section.type === 'featured'" class="featured-section">
-            <div 
-              v-for="template in section.templates"
-              :key="template.id"
-              :class="['featured-item', { highlighted: template.highlighted }]"
-              @click="insertTemplate(template)"
-            >
+            <div v-for="template in section.templates" :key="template.id"
+              :class="['featured-item', { highlighted: template.highlighted }]" @click="insertTemplate(template)">
               <div class="featured-avatar">
                 <img :src="template.avatar" :alt="template.title" />
               </div>
@@ -101,7 +85,7 @@
               </div>
             </div>
           </div>
-          
+
         </template>
       </div>
     </div>
@@ -126,16 +110,16 @@ export default {
         return total + section.templates.length
       }, 0)
     },
-    
+
     // 根据搜索条件过滤模版
     filteredSections() {
       if (!this.searchQuery.trim()) {
         return this.sidebarData.templateSections
       }
-      
+
       return this.sidebarData.templateSections.map(section => ({
         ...section,
-        templates: section.templates.filter(template => 
+        templates: section.templates.filter(template =>
           template.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
           (template.description && template.description.toLowerCase().includes(this.searchQuery.toLowerCase()))
         )
@@ -150,11 +134,11 @@ export default {
       category.active = true
       this.$emit('category-changed', category)
     },
-    
+
     insertTemplate(template) {
       this.$emit('template-selected', template)
     },
-    
+
     // 根据分类筛选模版
     filterByCategory(categoryName) {
       // 这里可以根据分类名称筛选模版
