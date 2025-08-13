@@ -1,25 +1,18 @@
 <template>
-  <node-view-wrapper class="city-spot-wrapper" >
+  <node-view-wrapper class="city-spot-wrapper" :class="{ 'city-spot-selected': diySelected }">
+    <!-- 使用抽取的悬浮操作栏组件 -->
+    <NodeFloatingActions v-if="diySelected" :node="node" :getPos="getPos" :editor="editor" :deleteNode="deleteNode" />
+
     <!-- 图片区域 -->
-    <div class="image-container" @click="handleImageClick">
-      <img 
-        :src="node.attrs.imageUrl || 'https://via.placeholder.com/600x400?text=Click+to+upload+image'"
-        :alt="node.attrs.title"
-        @error="handleImageError"
-        class="spot-image"
-      />
-      <input 
-        ref="fileInput"
-        type="file" 
-        accept="image/*" 
-        @change="handleFileChange"
-        style="display: none;"
-      />
+    <div class="image-container">
+      <img :src="node.attrs.imageUrl || 'https://via.placeholder.com/600x400?text=Click+to+upload+image'"
+        :alt="node.attrs.title" @error="handleImageError" class="spot-image" />
+      <!-- <input ref="fileInput" type="file" accept="image/*" style="display: none;" /> -->
     </div>
 
     <!-- 内容区域 -->
     <NodeViewContent class="content-area">
-      
+
     </NodeViewContent>
 
   </node-view-wrapper>
@@ -31,6 +24,8 @@ import { NodeViewWrapper, NodeViewContent } from '@tiptap/vue-3'
 import type { Node } from '@tiptap/pm/model'
 import type { Editor } from '@tiptap/core'
 import CitySpotSettings from './CitySpotSettings.vue'
+import NodeFloatingActions from './NodeFloatingActions.vue' // 导入新组件
+import { compareNodes } from '@/utils/editorUtils'
 
 interface CitySpotNodeAttrs {
   imageUrl: string
@@ -47,6 +42,7 @@ export default defineComponent({
     NodeViewWrapper,
     NodeViewContent,
     CitySpotSettings,
+    NodeFloatingActions, // 注册新组件
   },
   props: {
     node: {
@@ -81,13 +77,25 @@ export default defineComponent({
       editingDescription: false,
       tempTitle: '',
       tempDescription: '',
+      diySelected: false
     }
+  },
+  watch: {
+    'editor.state.selection.$from': {
+      handler(newVal, oldVal) {
+        if(newVal){
+          // 传入getPos函数作为第三个参数
+          this.diySelected = compareNodes(newVal, this.node, this.getPos);
+          console.log(this.diySelected);
+        }
+      },
+    },
   },
   methods: {
     handleImageClick(): void {
       (this.$refs.fileInput as HTMLInputElement)?.click()
     },
-    
+
     handleFileChange(event: Event): void {
       const target = event.target as HTMLInputElement
       const file = target.files?.[0]
@@ -101,16 +109,16 @@ export default defineComponent({
         reader.readAsDataURL(file)
       }
     },
-    
+
     handleImageError(event: Event): void {
       const target = event.target as HTMLImageElement
       target.src = 'https://via.placeholder.com/600x400?text=Image+Not+Found'
     },
-    
+
     handleImageChange(imageUrl: string): void {
       this.updateAttributes({ imageUrl })
     },
-    
+
     editTitle(): void {
       this.editingTitle = true
       this.tempTitle = this.node.attrs.title
@@ -118,14 +126,14 @@ export default defineComponent({
         (this.$refs.titleInput as HTMLInputElement)?.focus()
       })
     },
-    
+
     saveTitle(): void {
       if (this.tempTitle.trim()) {
         this.updateAttributes({ title: this.tempTitle.trim() })
       }
       this.editingTitle = false
     },
-    
+
     editDescription(): void {
       this.editingDescription = true
       this.tempDescription = this.node.attrs.description
@@ -133,102 +141,105 @@ export default defineComponent({
         (this.$refs.descriptionInput as HTMLTextAreaElement)?.focus()
       })
     },
-    
+
     saveDescription(): void {
       if (this.tempDescription.trim()) {
         this.updateAttributes({ description: this.tempDescription.trim() })
       }
       this.editingDescription = false
     },
-    
+
     cancelEdit(): void {
       this.editingTitle = false
       this.editingDescription = false
       this.tempTitle = ''
       this.tempDescription = ''
     },
-    
+
     handleDelete(): void {
       if (this.deleteNode) {
         this.deleteNode()
       }
+    },
+
+    addNewNode(): void {
+      // 获取当前节点的位置
+      const pos = this.getPos()
+      // 在当前节点后插入新的城市景点节点
+      this.editor.chain().focus().insertContentAt(pos + this.node.nodeSize, {
+        type: 'citySpotNode',
+        attrs: {
+          imageUrl: 'https://via.placeholder.com/600x400?text=New+City+Spot',
+        },
+        content: [
+          {
+            type: 'simpleHeading',
+            attrs: { text: '新城市景点' },
+            content: [{ type: 'text', text: '新城市景点' }]
+          },
+          {
+            type: 'simpleParagraph',
+            attrs: { text: '城市描述' },
+            content: [{ type: 'text', text: '城市描述' }]
+          }
+        ],
+      }).run()
+    },
+
+    moveNodeDown(): void {
+      // 获取当前节点的位置
+      const pos = this.getPos()
+      // 获取文档中的下一个节点
+      const { doc } = this.editor.state
+      const $pos = doc.resolve(pos)
+      const after = $pos.after()
+
+      // 如果有下一个节点，则交换位置
+      if (after < doc.content.size) {
+        this.editor.chain().focus()
+          .command(({ tr }) => {
+            // 创建一个事务来移动节点
+            tr.delete(pos, pos + this.node.nodeSize)
+            tr.insert(after, this.node)
+            return true
+          })
+          .run()
+      }
+    },
+
+    duplicateNode(): void {
+      // 获取当前节点的位置
+      const pos = this.getPos()
+      // 复制当前节点并在其后插入
+      const nodeJSON = this.node.toJSON()
+      this.editor.chain().focus().insertContentAt(pos + this.node.nodeSize, nodeJSON).run()
     },
   },
 })
 </script>
 
 <style scoped>
-.content-editable {
-  outline: none;
-}
-
-.content-editable h2.spot-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin: 0 0 10px 0;
-  color: #333;
-}
-
-.content-editable p.spot-description {
-  font-size: 1rem;
-  line-height: 1.5;
-  color: #666;
-  margin: 0;
-}
 .city-spot-wrapper {
   position: relative;
-  margin: 16px 0;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  background: var(--bg-color, #ffffff);
-  border: 2px solid var(--border-color, #e5e7eb);
-  transition: all 0.3s ease;
-}
-
-.city-spot-wrapper:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.toolbar {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 10;
-  display: flex;
-  gap: 4px;
-}
-
-.delete-btn {
-  width: 24px;
-  height: 24px;
-  border: none;
-  border-radius: 50%;
-  background: rgba(239, 68, 68, 0.9);
-  color: white;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: bold;
-  transition: all 0.2s ease;
-}
-
-.delete-btn:hover {
-  background: rgba(239, 68, 68, 1);
-  transform: scale(1.1);
+  margin: 2rem 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  /* overflow: hidden; */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: white;
 }
 
 .image-container {
-  position: relative;
-  cursor: pointer;
+  width: 100%;
+  height: 300px;
   overflow: hidden;
+  cursor: pointer;
+  position: relative;
 }
 
 .spot-image {
   width: 100%;
-  height: 200px;
+  height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
 }
@@ -238,74 +249,26 @@ export default defineComponent({
 }
 
 .content-area {
-  padding: 16px;
+  padding: 1.5rem;
 }
 
-.title-section,
-.description-section {
-  margin-bottom: 12px;
+.content-area :deep(h1),
+.content-area :deep(h2),
+.content-area :deep(h3) {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
 }
 
-.editable-field {
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: 4px;
-  padding: 4px 8px;
-  margin: -4px -8px;
+.content-area :deep(p) {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
 }
 
-.editable-field:hover {
-  background-color: rgba(59, 130, 246, 0.1);
-}
-
-.editable-field.empty {
-  color: #9ca3af;
-  font-style: italic;
-}
-
-.spot-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin: 0;
-  color: #1f2937;
-  line-height: 1.3;
-}
-
-.spot-description {
-  font-size: 1rem;
-  line-height: 1.5;
-  color: #6b7280;
-  margin: 0;
-}
-
-.title-input,
-.description-input {
-  width: 100%;
+.city-spot-selected {
   border: 2px solid #3b82f6;
-  border-radius: 4px;
-  padding: 8px 12px;
-  font-size: inherit;
-  font-family: inherit;
-  outline: none;
-  transition: border-color 0.2s ease;
-}
-
-.title-input {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #1f2937;
-}
-
-.description-input {
-  font-size: 1rem;
-  color: #6b7280;
-  resize: vertical;
-  min-height: 60px;
-}
-
-.title-input:focus,
-.description-input:focus {
-  border-color: #1d4ed8;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  /* 蓝色边框 */
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+  /* 蓝色阴影效果 */
 }
 </style>

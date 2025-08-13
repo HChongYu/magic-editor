@@ -208,7 +208,7 @@ export default {
                     this.$emit('update', editor)
                 },
                 onSelectionUpdate: ({ editor }) => {
-                    this.checkSelectedNode(editor)
+                    
                     this.$emit('selection-update', editor)
                 },
                 onFocus: ({ editor, event }) => {
@@ -513,25 +513,6 @@ export default {
             }
         },
 
-        checkSelectedNode(editorInstance) {
-            const { selection } = editorInstance.state
-            const { $from } = selection
-            let node = null
-
-            for (let i = $from.depth; i > 0; i--) {
-                const currentNode = $from.node(i)
-                if (currentNode.type.name === 'doubleTextNode') {
-                    node = currentNode
-                    break
-                }
-            }
-
-            if (node) {
-                this.selectedNodeInfo = `双文本节点 - 上段: ${node.attrs.topColor}, 下段: ${node.attrs.bottomColor}`
-            } else {
-                this.selectedNodeInfo = null
-            }
-        },
 
         copySelectedNode() {
             if (!this.editor) return

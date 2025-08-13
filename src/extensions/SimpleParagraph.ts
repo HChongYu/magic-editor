@@ -1,10 +1,9 @@
 import { Node } from '@tiptap/core'
-import { VueNodeViewRenderer } from '@tiptap/vue-3'
-import SimpleHeadingView from '@/components/SimpleHeadingView.vue'
+// import { VueNodeViewRenderer } from '@tiptap/vue-3'
 
 export default Node.create({
-  name: 'simpleHeading',
-
+  name: 'simpleParagraph',
+  
   group: 'block',  // 改为 'block'，因为这是一个块级元素
   content: 'text*', // 添加这一行，表示可以包含任意数量的文本节点
   defining: true,
@@ -14,21 +13,18 @@ export default Node.create({
   addOptions() {
     return {
       HTMLAttributes: {
-        class: 'simple-heading',
+        class: 'simple-paragraph',
       },
     }
   },
-
+  
   addAttributes() {
     return {
-      level: {
-        default: 2,
-        parseHTML: element => {
-          const level = element.tagName.match(/^H([1-6])$/)
-          return level ? parseInt(level[1]) : 2
-        },
+      style: {
+        default: 'normal',
+        parseHTML: element => element.getAttribute('data-style') || 'normal',
         renderHTML: attributes => ({
-          // 确保level属性正确传递给HTML标签
+          'data-style': attributes.style,
         }),
       },
       text: {
@@ -40,25 +36,17 @@ export default Node.create({
       },
     }
   },
-
+  
   parseHTML() {
     return [
-      { tag: 'h1', attrs: { level: 1 } },
-      { tag: 'h2', attrs: { level: 2 } },
-      { tag: 'h3', attrs: { level: 3 } },
+      { tag: 'p.simple-paragraph' },
     ]
   },
 
   renderHTML({ HTMLAttributes, node }) {
-    const level = node.attrs.level || 2
-    // 修改返回格式，确保与ProseMirror的序列化机制兼容
+    // 使用p标签作为底层渲染标签
     // 使用数组格式：[标签名, 属性对象, 0]
     // 0是ProseMirror的占位符，表示内容应该插入的位置
-    return [`h${level}`, { ...HTMLAttributes, class: 'simple-heading' }, 0]
-  },
-
-  // 添加节点视图渲染器
-  // addNodeView() {
-  //   return VueNodeViewRenderer(SimpleHeadingView as any)
-  // },
+    return ['p', { ...HTMLAttributes, class: 'simple-paragraph' }, 0]
+  }
 })

@@ -42,6 +42,7 @@ import ControlPanel from '../components/RightSidebar/ControlPanel.vue'
 // 导入自定义节点扩展
 import CitySpotNode from '@/extensions/CitySpotNode'
 import SimpleHeading from '@/extensions/SimpleHeading'
+import SimpleParagraph from '@/extensions/SimpleParagraph'
 
 import { TemplateNodeType } from '@/enums'
 
@@ -61,7 +62,8 @@ export default {
       editorHTML: '',
       customExtensions: [
         CitySpotNode,
-        SimpleHeading
+        SimpleHeading,
+        SimpleParagraph
       ]
     }
   },

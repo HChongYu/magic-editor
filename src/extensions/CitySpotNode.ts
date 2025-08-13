@@ -7,9 +7,6 @@ interface CitySpotAttributes {
   imageUrl: string
   title: string
   description: string
-  qrCode?: string
-  backgroundColor: string
-  borderColor: string
 }
 
 // 声明命令类型
@@ -30,11 +27,11 @@ const CitySpotNode = Node.create({
 
   defining: true,
 
-  draggable: true,
+  draggable: false,
 
   selectable: true,
 
-  content: 'simpleHeading',
+  content: 'simpleHeading simpleParagraph',
 
   addAttributes() {
     return {
@@ -55,7 +52,9 @@ const CitySpotNode = Node.create({
       },
     ]
   },
-
+  renderHTML({ HTMLAttributes }) {
+    return ['div', mergeAttributes(HTMLAttributes, { 'data-type': 'city-spot' }), 0]
+  },
   addNodeView() {
     return VueNodeViewRenderer(CitySpotView as any)
   },
@@ -76,6 +75,20 @@ const CitySpotNode = Node.create({
                   attrs: {
                     text: attributes.title || '城市景点',
                   },
+                  content: [{
+                    type: 'text',
+                    text: attributes.title || '城市景点'
+                  }]
+                },
+                {
+                  type: 'simpleParagraph',
+                  attrs: {
+                    text: attributes.description || '城市描述',
+                  },
+                  content: [{
+                    type: 'text',
+                    text: attributes.description || '城市描述'
+                  }]
                 }
               ],
             })
