@@ -1,13 +1,10 @@
 <template>
   <div class="floating-actions" @click.stop="()=>{}">
-    <button class="action-btn add-btn" @click="addCurrentNode" title="添加新节点">
+    <button class="action-btn add-btn" @click="addCurrentNodeClick" title="添加新节点">
       <span>+</span>
     </button>
-    <button class="action-btn move-down-btn" @click="moveNodeDown" title="向下移动">
+    <button class="action-btn move-down-btn" @click="moveNodeDownClick" title="向下移动">
       <span>↓</span>
-    </button>
-    <button class="action-btn duplicate-btn" @click="$emit('duplicate')" title="复制节点">
-      <span>⎘</span>
     </button>
     <button class="action-btn delete-btn" @click="deleteNode" title="删除节点">
       <span>×</span>
@@ -15,48 +12,46 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, type PropType } from 'vue'
+<script setup lang="ts">
+import { type PropType } from 'vue'
 import type { Node } from '@tiptap/pm/model'
 import type { Editor } from '@tiptap/core'
 import { addCurrentNode, moveNodeDown } from '@/utils/editorUtils'
-export default defineComponent({
-  name: 'NodeFloatingActions',
-  props: {
-    node: {
-      type: Object as PropType<Node>,
-      required: true,
-    },
-    getPos: {
-      type: Function as PropType<() => number>,
-      required: true,
-    },
-    editor: {
-      type: Object as PropType<Editor>,
-      required: true,
-    },
-    deleteNode: {
-      type: Function as PropType<() => void>,
-      required: true,
-    },
-  },
-  emits: ['add', 'moveDown', 'duplicate', 'delete', 'update'],
-  methods: {
-    addCurrentNode() {
-      // 确保传递正确的参数
-      console.log(this.node.type.name)
-      if (this.editor && this.node && this.getPos) {
 
-        addCurrentNode(this.editor, this.node, this.getPos)
-      }
-    },
-    moveNodeDown() {
-      if (this.editor && this.node && this.getPos) {
-        moveNodeDown(this.editor, this.node, this.getPos)
-      }
-    }
-  }
+const props = defineProps({
+  node: {
+    type: Object as PropType<Node>,
+    required: true,
+  },
+  getPos: {
+    type: Function as PropType<() => number>,
+    required: true,
+  },
+  editor: {
+    type: Object as PropType<Editor>,
+    required: true,
+  },
+  deleteNode: {
+    type: Function as PropType<() => void>,
+    required: true,
+  },
 })
+
+const emit = defineEmits(['add', 'moveDown', 'duplicate', 'delete', 'update'])
+
+function addCurrentNodeClick() {
+  // 确保传递正确的参数
+  console.log(props.node.type.name)
+  if (props.editor && props.node && props.getPos) {
+    addCurrentNode(props.editor, props.node, props.getPos)
+  }
+}
+
+function moveNodeDownClick() {
+  if (props.editor && props.node && props.getPos) {
+    moveNodeDown(props.editor, props.node, props.getPos)
+  }
+}
 </script>
 
 <style scoped>

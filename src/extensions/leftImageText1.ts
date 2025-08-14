@@ -1,30 +1,27 @@
 import { Node, mergeAttributes } from '@tiptap/core'
 import { VueNodeViewRenderer } from '@tiptap/vue-3'
-import SpotCardView from '@/components/SpotCardView.vue'
+import LeftImageText1View from '@/components/LeftImageText1View.vue'
 
-// 景点卡片节点属性类型定义
-interface SpotCardAttributes {
+// 左图右文节点属性类型定义
+interface LeftImageText1Attributes {
   imageUrl: string
   title: string
   subtitle: string
-  rating: number
-  landmark: boolean
-  checkin: boolean
 }
 
 // 声明命令类型
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
-    spotCard: {
-      insertSpotCard: (attributes?: Partial<SpotCardAttributes>) => ReturnType
-      updateSpotCard: (attributes: Partial<SpotCardAttributes>) => ReturnType
-      setSpotCardImage: (imageUrl: string) => ReturnType
+    leftImageText1: {
+      insertLeftImageText1: (attributes?: Partial<LeftImageText1Attributes>) => ReturnType
+      updateLeftImageText1: (attributes: Partial<LeftImageText1Attributes>) => ReturnType
+      setLeftImageText1Image: (imageUrl: string) => ReturnType
     }
   }
 }
 
-const SpotCardNode = Node.create({
-  name: 'spotCardNode',
+const LeftImageText1 = Node.create({
+  name: 'leftImageText1',
 
   group: 'block',
 
@@ -44,27 +41,6 @@ const SpotCardNode = Node.create({
         renderHTML: attributes => ({
           'data-image-url': attributes.imageUrl,
         }),
-      },
-      rating: {
-        default: 4.5,
-        parseHTML: element => parseFloat(element.getAttribute('data-rating') || '4.5'),
-        renderHTML: attributes => ({
-          'data-rating': attributes.rating,
-        }),
-      },
-      landmark: {
-        default: true,
-        parseHTML: element => element.getAttribute('data-landmark') === 'true',
-        renderHTML: attributes => ({
-          'data-landmark': attributes.landmark,
-        }),
-      },
-      checkin: {
-        default: false,
-        parseHTML: element => element.getAttribute('data-checkin') === 'true',
-        renderHTML: attributes => ({
-          'data-checkin': attributes.checkin,
-        }),
       }
     }
   },
@@ -72,63 +48,65 @@ const SpotCardNode = Node.create({
   parseHTML() {
     return [
       {
-        tag: 'div[data-type="spot-card"]',
+        tag: 'div[data-type="left-image-text1"]',
       },
     ]
   },
-  
+
   renderHTML({ HTMLAttributes }) {
-    return ['div', mergeAttributes(HTMLAttributes, { 'data-type': 'spot-card' }), 0]
+    return ['div', mergeAttributes(HTMLAttributes, { 'data-type': 'left-image-text1' }), 0]
   },
-  
+
   addNodeView() {
-    return VueNodeViewRenderer(SpotCardView as any)
+    return VueNodeViewRenderer(LeftImageText1View as any)
   },
 
   addCommands() {
     return {
-      insertSpotCard:
+      insertLeftImageText1:
         (attributes = {}) =>
           ({ commands }) => {
             return commands.insertContent({
               type: this.name,
               attrs: {
                 imageUrl: attributes.imageUrl || 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=600&h=400&fit=crop',
-                rating: attributes.rating || 4.5,
-                landmark: attributes.landmark !== undefined ? attributes.landmark : true,
-                checkin: attributes.checkin !== undefined ? attributes.checkin : false,
               },
               content: [
                 {
                   type: 'simpleHeading',
                   attrs: {
-                    text: attributes.title || '涉谷十字路口',
+                    text: attributes.title || '标题文本',
                     level: 2,
                   },
                   content: [{
                     type: 'text',
-                    text: attributes.title || '涉谷十字路口'
+                    text: attributes.title || '标题文本',
+                    marks: [
+                      {
+                        type: 'bold'
+                      }
+                    ]
                   }]
                 },
                 {
                   type: 'simpleParagraph',
                   attrs: {
-                    text: attributes.subtitle || 'Fushimi inari-tatisha Shrine',
+                    text: attributes.subtitle || '描述文本内容',
                   },
                   content: [{
                     type: 'text',
-                    text: attributes.subtitle || 'Fushimi inari-tatisha Shrine'
+                    text: attributes.subtitle || '描述文本内容'
                   }]
                 }
               ],
             })
           },
-      updateSpotCard:
+      updateLeftImageText1:
         (attributes) =>
           ({ commands }) => {
             return commands.updateAttributes(this.name, attributes)
           },
-      setSpotCardImage:
+      setLeftImageText1Image:
         (imageUrl) =>
           ({ commands }) => {
             return commands.updateAttributes(this.name, { imageUrl })
@@ -137,4 +115,4 @@ const SpotCardNode = Node.create({
   },
 })
 
-export default SpotCardNode
+export default LeftImageText1

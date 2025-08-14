@@ -174,6 +174,9 @@ export default {
   flex-direction: column;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   box-shadow: none; /* 移除阴影 */
+  position: fixed;
+  top: 43px;
+  right: 0;
 }
 
 /* 头部控制区 */

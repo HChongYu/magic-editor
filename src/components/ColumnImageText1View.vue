@@ -1,11 +1,11 @@
 <template>
-  <node-view-wrapper class="tea-brew-step-wrapper" :class="{ 'tea-brew-step-selected': diySelected }">
+  <node-view-wrapper class="column-image-text1-wrapper" :class="{ 'column-image-text1-selected': diySelected }">
     <!-- 使用抽取的悬浮操作栏组件 -->
     <NodeFloatingActions v-if="diySelected" :node="node" :getPos="getPos" :editor="editor" :deleteNode="deleteNode" />
 
-    <div class="tea-brew-steps-container">
+    <div class="column-image-text1-steps-container">
       <!-- 遍历步骤 -->
-      <div v-for="(step, index) in node.attrs.steps" :key="index" class="tea-brew-step">
+      <div v-for="(step, index) in node.attrs.steps" :key="index" class="column-image-text1-step">
         <!-- 图片区域 -->
         <div class="step-image-container">
           <img :src="step.imageUrl || 'https://via.placeholder.com/600x400?text=Click+to+upload+image'" 
@@ -33,17 +33,17 @@ import type { Editor } from '@tiptap/core'
 import NodeFloatingActions from './NodeFloatingActions.vue'
 import { compareNodes } from '@/utils/editorUtils'
 
-interface TeaBrewStep {
+interface ColumnImageText1Step {
   imageUrl: string
   text: string
 }
 
-interface TeaBrewStepNodeAttrs {
-  steps: TeaBrewStep[]
+interface ColumnImageText1NodeAttrs {
+  steps: ColumnImageText1Step[]
 }
 
 export default defineComponent({
-  name: 'TeaBrewStepView',
+  name: 'ColumnImageText1View',
   components: {
     NodeViewWrapper,
     NodeFloatingActions,
@@ -54,7 +54,7 @@ export default defineComponent({
       required: true,
     },
     updateAttributes: {
-      type: Function as PropType<(attributes: Partial<TeaBrewStepNodeAttrs>) => void>,
+      type: Function as PropType<(attributes: Partial<ColumnImageText1NodeAttrs>) => void>,
       required: true,
     },
     editor: {
@@ -108,7 +108,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.tea-brew-step-wrapper {
+.column-image-text1-wrapper {
   position: relative;
   border-radius: 8px;
   border: 1px solid #e0e0e0;
@@ -119,18 +119,18 @@ export default defineComponent({
   padding: 16px;
 }
 
-.tea-brew-step-selected {
+.column-image-text1-selected {
   box-shadow: 0 0 0 2px #4285f4;
 }
 
-.tea-brew-steps-container {
+.column-image-text1-steps-container {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   gap: 16px;
 }
 
-.tea-brew-step {
+.column-image-text1-step {
   flex: 1;
   display: flex;
   flex-direction: column;

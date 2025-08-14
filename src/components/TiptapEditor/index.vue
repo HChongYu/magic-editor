@@ -205,7 +205,7 @@ export default {
                 extensions: extensionsToUse,
                 onUpdate: ({ editor }) => {
                     console.log('编辑器内容已更新', editor)
-                    this.$emit('update', editor)
+                    this.$emit('update', { editor })
                 },
                 onSelectionUpdate: ({ editor }) => {
                     
@@ -301,7 +301,7 @@ export default {
         },
 
         getContent() {
-            return this.editor?.getHTML() || ''
+            // return this.editor?.getHTML() || ''
         },
 
         setContent(content) {

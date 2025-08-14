@@ -21,10 +21,10 @@ export default Node.create({
   addAttributes() {
     return {
       style: {
-        default: 'normal',
-        parseHTML: element => element.getAttribute('data-style') || 'normal',
+        default: 'font-size: 16px; line-height: normal; font-weight: 400;',
+        parseHTML: element => element.getAttribute('data-style'),
         renderHTML: attributes => ({
-          'data-style': attributes.style,
+          'style': attributes.style,
         }),
       },
       text: {

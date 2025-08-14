@@ -5,7 +5,7 @@
         <h2>Tiptap Project</h2>
       </div>
     </nav>
-    
+
     <main class="app-main">
       <router-view v-slot="{ Component }">
         <transition name="fade" mode="out-in">
@@ -16,32 +16,30 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'App',
-  data() {
-    return {
-      showDropdown: false,
-      mainRoutes: [
-        { name: 'WorkSpace', path: '/workspace', meta: { title: '工作区', icon: '🏠' } },
-        { name: 'Editor', path: '/editor', meta: { title: '编辑器', icon: '✏️' } },
-        { name: 'Settings', path: '/settings', meta: { title: '设置', icon: '⚙️' } }
-      ],
-      componentRoutes: [
-        { name: 'TravelCards', path: '/cards/travel', meta: { title: '旅行卡片', icon: '🧳' } },
-        { name: 'RichTravelCards', path: '/cards/rich-travel', meta: { title: '富文本旅行卡片', icon: '🎨' } },
-        { name: 'ImageTextList', path: '/components/image-text-list', meta: { title: '图文列表', icon: '📝' } },
-        { name: 'DoubleText', path: '/components/double-text', meta: { title: '双文本', icon: '📄' } }
-      ]
-    }
-  },
-  computed: {
-    showNavigation() {
-      // 在404页面隐藏导航
-      return this.$route.name !== 'NotFound'
-    }
-  }
-}
+<script setup>
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const showDropdown = ref(false)
+
+const mainRoutes = [
+  { name: 'WorkSpace', path: '/workspace', meta: { title: '工作区', icon: '🏠' } },
+  { name: 'Editor', path: '/editor', meta: { title: '编辑器', icon: '✏️' } },
+  { name: 'Settings', path: '/settings', meta: { title: '设置', icon: '⚙️' } }
+]
+
+const componentRoutes = [
+  { name: 'TravelCards', path: '/cards/travel', meta: { title: '旅行卡片', icon: '🧳' } },
+  { name: 'RichTravelCards', path: '/cards/rich-travel', meta: { title: '富文本旅行卡片', icon: '🎨' } },
+  { name: 'ImageTextList', path: '/components/image-text-list', meta: { title: '图文列表', icon: '📝' } },
+  { name: 'DoubleText', path: '/components/double-text', meta: { title: '双文本', icon: '📄' } }
+]
+
+const showNavigation = computed(() => {
+  // 在404页面隐藏导航
+  return route.name !== 'NotFound'
+})
 </script>
 
 <style>
@@ -49,7 +47,8 @@ export default {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-size: 10px; 
+  font-family: "PingFang SC";
+  font-weight: 400;
 }
 
 body {
@@ -64,6 +63,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: rgba(75, 75, 80, 0.36);
 }
 
 .app-nav {
@@ -188,23 +188,23 @@ body {
   .app-nav {
     padding: 0 1rem;
   }
-  
+
   .nav-brand h2 {
     font-size: 2rem;
   }
-  
+
   .nav-links {
     gap: 0.5rem;
   }
-  
+
   .nav-link {
     padding: 1rem 1.5rem;
   }
-  
+
   .nav-text {
     display: none;
   }
-  
+
   .dropdown-menu {
     right: 0;
     left: auto;

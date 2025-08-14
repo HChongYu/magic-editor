@@ -1,9 +1,9 @@
 import { Node, mergeAttributes } from '@tiptap/core'
 import { VueNodeViewRenderer } from '@tiptap/vue-3'
-import TeaBrewStepView from '@/components/TeaBrewStepView.vue'
+import ColumnImageText1View from '@/components/ColumnImageText1View.vue'
 
-// 茶叶冲泡步骤节点属性类型定义
-interface TeaBrewStepAttributes {
+// 列式图文节点属性类型定义
+interface ColumnImageText1Attributes {
   steps: Array<{
     imageUrl: string
     text: string
@@ -13,15 +13,15 @@ interface TeaBrewStepAttributes {
 // 声明命令类型
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
-    teaBrewStep: {
-      insertTeaBrewStep: (attributes?: Partial<TeaBrewStepAttributes>) => ReturnType
-      updateTeaBrewStep: (attributes: Partial<TeaBrewStepAttributes>) => ReturnType
+    columnImageText1: {
+      insertColumnImageText1: (attributes?: Partial<ColumnImageText1Attributes>) => ReturnType
+      updateColumnImageText1: (attributes: Partial<ColumnImageText1Attributes>) => ReturnType
     }
   }
 }
 
-const TeaBrewStepNode = Node.create({
-  name: 'teaBrewStepNode',
+const ColumnImageText1 = Node.create({
+  name: 'columnImageText1',
 
   group: 'block',
 
@@ -62,22 +62,22 @@ const TeaBrewStepNode = Node.create({
   parseHTML() {
     return [
       {
-        tag: 'div[data-type="tea-brew-step"]',
+        tag: 'div[data-type="column-image-text1"]',
       },
     ]
   },
   
   renderHTML({ HTMLAttributes }) {
-    return ['div', mergeAttributes(HTMLAttributes, { 'data-type': 'tea-brew-step' }), 0]
+    return ['div', mergeAttributes(HTMLAttributes, { 'data-type': 'column-image-text1' }), 0]
   },
   
   addNodeView() {
-    return VueNodeViewRenderer(TeaBrewStepView as any)
+    return VueNodeViewRenderer(ColumnImageText1View as any)
   },
 
   addCommands() {
     return {
-      insertTeaBrewStep:
+      insertColumnImageText1:
         (attributes = {}) =>
           ({ commands }) => {
             return commands.insertContent({
@@ -100,7 +100,7 @@ const TeaBrewStepNode = Node.create({
               },
             })
           },
-      updateTeaBrewStep:
+      updateColumnImageText1:
         (attributes) =>
           ({ commands }) => {
             return commands.updateAttributes(this.name, attributes)
@@ -109,4 +109,4 @@ const TeaBrewStepNode = Node.create({
   },
 })
 
-export default TeaBrewStepNode
+export default ColumnImageText1
