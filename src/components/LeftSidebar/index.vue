@@ -71,12 +71,17 @@ export default {
       }
       switch (type) {
         case DiyNodeType.LARGE_IMAGE_TEXT1:
-          editor.commands.insertCitySpot({
+          editor.commands.insertLargeImageText1({
             title: config.title,
             description: config.description,
-            imageUrl: config.image,
-
+            imageUrl: config.image
           })
+          break
+        case DiyNodeType.LEFT_IMAGE_TEXT1:
+          editor.commands.insertSpotCard()
+          break
+        case DiyNodeType.COLUMN_IMAGE_TEXT1:
+          editor.commands.insertTeaBrewStep()
           break
       }
     },
@@ -86,14 +91,14 @@ export default {
 
 <style scoped>
 .template-library {
-  width: 300px;
+  width: 250px; /* 调整宽度 */
   height: 100vh;
   background: #ffffff;
   border-right: 1px solid #e1e4e8;
   display: flex;
   flex-direction: column;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  box-shadow: none; /* 移除阴影 */
 }
 
 /* 头部区域 */

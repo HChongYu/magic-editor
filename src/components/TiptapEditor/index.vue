@@ -688,19 +688,26 @@ export default {
     background: #0056b3;
 }
 
+.tiptap-editor {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0; /* 移除内边距 */
+}
+
 /* 编辑器失去焦点时的视觉提示 */
 :deep(.ProseMirror) {
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    padding: 12px;
-    min-height: 200px;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
+  border: none; /* 移除边框 */
+  border-radius: 0;
+  padding: 12px;
+  min-height: 200px;
+  height: auto;
+  outline: none;
+  transition: none;
 }
 
 .tiptap-editor:has(.ProseMirror:focus) :deep(.ProseMirror) {
-    border-color: #007bff;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  border-color: transparent;
+  box-shadow: none; /* 移除聚焦时的阴影 */
 }
 
 .bubble-menu {

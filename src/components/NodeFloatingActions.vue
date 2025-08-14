@@ -1,6 +1,6 @@
 <template>
-  <div class="floating-actions">
-    <button class="action-btn add-btn" @click.="addCurrentNode" title="添加新节点">
+  <div class="floating-actions" @click.stop="()=>{}">
+    <button class="action-btn add-btn" @click="addCurrentNode" title="添加新节点">
       <span>+</span>
     </button>
     <button class="action-btn move-down-btn" @click="moveNodeDown" title="向下移动">

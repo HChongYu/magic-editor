@@ -166,14 +166,14 @@ export default {
 
 <style scoped>
 .control-panel {
-  width: 340px;
+  width: 300px; /* 调整宽度 */
   height: 100vh;
   background: #ffffff;
   border-left: 1px solid #e1e4e8;
   display: flex;
   flex-direction: column;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  box-shadow: none; /* 移除阴影 */
 }
 
 /* 头部控制区 */

@@ -20,7 +20,16 @@
                     "image": "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=300&h=200&fit=crop",
                     "size": "large"
                 }
+            },
+            {
+                "type": "leftImageText1",
+                "leftTitle": "左侧大图文" 
+            },
+            {
+                "type": "columnImageText1",
+                "leftTitle": "左侧大图文" 
             }
+            
         ]
     }
 }

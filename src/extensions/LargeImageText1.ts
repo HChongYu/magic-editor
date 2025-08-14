@@ -1,9 +1,9 @@
 import { Node, mergeAttributes } from '@tiptap/core'
 import { VueNodeViewRenderer } from '@tiptap/vue-3'
-import CitySpotView from '@/components/CitySpotView.vue'
+import LargeImageText1View from '@/components/LargeImageText1View.vue'
 
 // 城市景点卡片节点属性类型定义
-interface CitySpotAttributes {
+interface LargeImageText1Attributes {
   imageUrl: string
   title: string
   description: string
@@ -12,16 +12,16 @@ interface CitySpotAttributes {
 // 声明命令类型
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
-    citySpot: {
-      insertCitySpot: (attributes?: Partial<CitySpotAttributes>) => ReturnType
-      updateCitySpot: (attributes: Partial<CitySpotAttributes>) => ReturnType
-      setCitySpotImage: (imageUrl: string) => ReturnType
+    largeImageText1: {
+      insertLargeImageText1: (attributes?: Partial<LargeImageText1Attributes>) => ReturnType
+      updateLargeImageText1: (attributes: Partial<LargeImageText1Attributes>) => ReturnType
+      setLargeImageText1Image: (imageUrl: string) => ReturnType
     }
   }
 }
 
-const CitySpotNode = Node.create({
-  name: 'citySpotNode',
+const largeImageText1 = Node.create({
+  name: 'largeImageText1',
 
   group: 'block',
 
@@ -56,12 +56,12 @@ const CitySpotNode = Node.create({
     return ['div', mergeAttributes(HTMLAttributes, { 'data-type': 'city-spot' }), 0]
   },
   addNodeView() {
-    return VueNodeViewRenderer(CitySpotView as any)
+    return VueNodeViewRenderer(LargeImageText1View as any)
   },
 
   addCommands() {
     return {
-      insertCitySpot:
+      insertLargeImageText1:
         (attributes = {}) =>
           ({ commands }) => {
             return commands.insertContent({
@@ -94,17 +94,17 @@ const CitySpotNode = Node.create({
             })
           },
       updateCitySpot:
-        (attributes) =>
-          ({ commands }) => {
+        (attributes: any) =>
+          ({ commands }: { commands: any }) => {
             return commands.updateAttributes(this.name, attributes)
           },
       setCitySpotImage:
-        (imageUrl) =>
-          ({ commands }) => {
+        (imageUrl: any) =>
+          ({ commands }: { commands: any }) => {
             return commands.updateAttributes(this.name, { imageUrl })
           },
     }
   },
 })
 
-export default CitySpotNode
+export default largeImageText1

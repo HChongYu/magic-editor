@@ -40,10 +40,11 @@ import LeftSidebar from '@/components/LeftSidebar'
 import ControlPanel from '../components/RightSidebar/ControlPanel.vue'
 
 // 导入自定义节点扩展
-import CitySpotNode from '@/extensions/CitySpotNode'
+import CitySpotNode from '@/extensions/LargeImageText1'
 import SimpleHeading from '@/extensions/SimpleHeading'
 import SimpleParagraph from '@/extensions/SimpleParagraph'
-
+import SpotCardNode from '@/extensions/leftImageText1'
+import TeaBrewStepNode from '@/extensions/TeaBrewStepNode'
 import { TemplateNodeType } from '@/enums'
 
 export default {
@@ -63,7 +64,9 @@ export default {
       customExtensions: [
         CitySpotNode,
         SimpleHeading,
-        SimpleParagraph
+        SimpleParagraph,
+        SpotCardNode,
+        TeaBrewStepNode
       ]
     }
   },
@@ -141,18 +144,19 @@ export default {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: auto; /* 允许滚动 */
   background: #ffffff;
   margin: 0;
+  padding: 0 20px; /* 添加左右内边距 */
 }
 
 .editor-container {
   flex: 1;
-  margin: 20px;
-  border: 1px solid #e1e4e8;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin: 20px 0; /* 只保留上下边距 */
+  border: none; /* 移除边框 */
+  border-radius: 0;
+  overflow: visible; /* 不限制内容溢出 */
+  box-shadow: none; /* 移除阴影 */
 }
 
 /* 响应式设计 */

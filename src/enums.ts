@@ -12,6 +12,8 @@ export enum TemplateNodeType {
 
 export enum DiyNodeType {
   LARGE_IMAGE_TEXT1 = 'largeImageText1',
+  LEFT_IMAGE_TEXT1 = 'leftImageText1',
+  COLUMN_IMAGE_TEXT1 = 'columnImageText1',
 }
 
 // 导出所有枚举的联合类型（可选）

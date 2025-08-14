@@ -23,25 +23,20 @@ import { defineComponent, nextTick, type PropType } from 'vue'
 import { NodeViewWrapper, NodeViewContent } from '@tiptap/vue-3'
 import type { Node } from '@tiptap/pm/model'
 import type { Editor } from '@tiptap/core'
-import CitySpotSettings from './CitySpotSettings.vue'
 import NodeFloatingActions from './NodeFloatingActions.vue' // 导入新组件
 import { compareNodes } from '@/utils/editorUtils'
 
-interface CitySpotNodeAttrs {
+interface LargeImageText1Attrs {
   imageUrl: string
   title: string
   description: string
-  qrCode?: string
-  backgroundColor: string
-  borderColor: string
 }
 
 export default defineComponent({
-  name: 'CitySpotView',
+  name: 'LargeImageText1View',
   components: {
     NodeViewWrapper,
     NodeViewContent,
-    CitySpotSettings,
     NodeFloatingActions, // 注册新组件
   },
   props: {
@@ -50,7 +45,7 @@ export default defineComponent({
       required: true,
     },
     updateAttributes: {
-      type: Function as PropType<(attributes: Partial<CitySpotNodeAttrs>) => void>,
+      type: Function as PropType<(attributes: Partial<LargeImageText1Attrs>) => void>,
       required: true,
     },
     editor: {
@@ -115,25 +110,6 @@ export default defineComponent({
       target.src = 'https://via.placeholder.com/600x400?text=Image+Not+Found'
     },
 
-    handleImageChange(imageUrl: string): void {
-      this.updateAttributes({ imageUrl })
-    },
-
-    editTitle(): void {
-      this.editingTitle = true
-      this.tempTitle = this.node.attrs.title
-      nextTick(() => {
-        (this.$refs.titleInput as HTMLInputElement)?.focus()
-      })
-    },
-
-    saveTitle(): void {
-      if (this.tempTitle.trim()) {
-        this.updateAttributes({ title: this.tempTitle.trim() })
-      }
-      this.editingTitle = false
-    },
-
     editDescription(): void {
       this.editingDescription = true
       this.tempDescription = this.node.attrs.description
@@ -154,66 +130,7 @@ export default defineComponent({
       this.editingDescription = false
       this.tempTitle = ''
       this.tempDescription = ''
-    },
-
-    handleDelete(): void {
-      if (this.deleteNode) {
-        this.deleteNode()
-      }
-    },
-
-    addNewNode(): void {
-      // 获取当前节点的位置
-      const pos = this.getPos()
-      // 在当前节点后插入新的城市景点节点
-      this.editor.chain().focus().insertContentAt(pos + this.node.nodeSize, {
-        type: 'citySpotNode',
-        attrs: {
-          imageUrl: 'https://via.placeholder.com/600x400?text=New+City+Spot',
-        },
-        content: [
-          {
-            type: 'simpleHeading',
-            attrs: { text: '新城市景点' },
-            content: [{ type: 'text', text: '新城市景点' }]
-          },
-          {
-            type: 'simpleParagraph',
-            attrs: { text: '城市描述' },
-            content: [{ type: 'text', text: '城市描述' }]
-          }
-        ],
-      }).run()
-    },
-
-    moveNodeDown(): void {
-      // 获取当前节点的位置
-      const pos = this.getPos()
-      // 获取文档中的下一个节点
-      const { doc } = this.editor.state
-      const $pos = doc.resolve(pos)
-      const after = $pos.after()
-
-      // 如果有下一个节点，则交换位置
-      if (after < doc.content.size) {
-        this.editor.chain().focus()
-          .command(({ tr }) => {
-            // 创建一个事务来移动节点
-            tr.delete(pos, pos + this.node.nodeSize)
-            tr.insert(after, this.node)
-            return true
-          })
-          .run()
-      }
-    },
-
-    duplicateNode(): void {
-      // 获取当前节点的位置
-      const pos = this.getPos()
-      // 复制当前节点并在其后插入
-      const nodeJSON = this.node.toJSON()
-      this.editor.chain().focus().insertContentAt(pos + this.node.nodeSize, nodeJSON).run()
-    },
+    }
   },
 })
 </script>
