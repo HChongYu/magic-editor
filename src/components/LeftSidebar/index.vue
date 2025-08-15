@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, defineProps, defineEmits } from 'vue'
 import sidebarData from '@/data/leftSidebarData.json'
 import { TemplateNodeType, DiyNodeType } from '@/enums'
 
@@ -56,6 +56,7 @@ const selectCategory = (category) => {
 
 const insertTemplate = (template) => {
   const { type, config } = template
+  console.log('type', config)
   const editor = props.editorInstance
   if (!editor) {
     return

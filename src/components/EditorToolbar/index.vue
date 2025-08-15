@@ -1,87 +1,68 @@
 <template>
   <div class="editor-toolbar">
-    <!-- 基础格式按钮组 -->
-    <div class="toolbar-group">
-      <button class="toolbar-btn" title="标题" @click="toggleHeading">
-        <span>H</span>
-      </button>
-      <button class="toolbar-btn" title="加粗" @click="toggleBold" :class="{ active: editor?.isActive('bold') }">
-        <span class="icon-bold">B</span>
-      </button>
-      <button class="toolbar-btn" title="斜体" @click="toggleItalic" :class="{ active: editor?.isActive('italic') }">
-        <span class="icon-italic">I</span>
-      </button>
-      <button class="toolbar-btn" title="下划线" @click="toggleUnderline" :class="{ active: editor?.isActive('underline') }">
-        <span class="icon-underline">U</span>
-      </button>
-      <button class="toolbar-btn" title="高亮" @click="toggleHighlight" :class="{ active: editor?.isActive('highlight') }">
-        <span class="icon-highlight">⚡</span>
-      </button>
-    </div>
-
-    <!-- 列表按钮组 -->
-    <div class="toolbar-group">
-      <button class="toolbar-btn" title="有序列表" @click="toggleOrderedList" :class="{ active: editor?.isActive('orderedList') }">
-        <span class="icon-ordered-list">1.</span>
-      </button>
-      <button class="toolbar-btn" title="无序列表" @click="toggleBulletList" :class="{ active: editor?.isActive('bulletList') }">
-        <span class="icon-bullet-list">•</span>
-      </button>
-    </div>
-
-    <!-- 对齐方式按钮组 -->
-    <div class="toolbar-group">
-      <button class="toolbar-btn" title="左对齐" @click="setTextAlign('left')" :class="{ active: editor?.isActive({ textAlign: 'left' }) }">
-        <span class="icon-align-left">≡</span>
-      </button>
-      <button class="toolbar-btn" title="居中对齐" @click="setTextAlign('center')" :class="{ active: editor?.isActive({ textAlign: 'center' }) }">
-        <span class="icon-align-center">≣</span>
-      </button>
-      <button class="toolbar-btn" title="右对齐" @click="setTextAlign('right')" :class="{ active: editor?.isActive({ textAlign: 'right' }) }">
-        <span class="icon-align-right">≡</span>
-      </button>
-      <button class="toolbar-btn" title="两端对齐" @click="setTextAlign('justify')" :class="{ active: editor?.isActive({ textAlign: 'justify' }) }">
-        <span class="icon-align-justify">≣</span>
-      </button>
-    </div>
-
-    <!-- 引用按钮 -->
-    <div class="toolbar-group">
-      <button class="toolbar-btn" title="引用" @click="toggleBlockquote" :class="{ active: editor?.isActive('blockquote') }">
-        <span class="icon-quote">"</span>
-      </button>
-    </div>
-
-    <!-- 媒体插入按钮组 -->
-    <div class="toolbar-group media-group">
-      <button class="toolbar-btn" title="图片" @click="insertImage">
-        <span class="icon-image">🖼️</span>
-      </button>
-      <button class="toolbar-btn" title="视频" @click="insertVideo">
-        <span class="icon-video">🎬</span>
-      </button>
-      <button class="toolbar-btn" title="表情" @click="insertEmoji">
-        <span class="icon-emoji">😊</span>
-      </button>
-      <button class="toolbar-btn" title="表格" @click="insertTable">
-        <span class="icon-table">📊</span>
-      </button>
-    </div>
-
-    <!-- 特殊内容按钮组 -->
-    <div class="toolbar-group special-group">
-      <button class="toolbar-btn" title="补充说明" @click="insertNote">
-        <span class="icon-note">补充说明</span>
-      </button>
-      <button class="toolbar-btn" title="插入亮点" @click="insertHighlight">
-        <span class="icon-highlight-point">插入亮点</span>
-      </button>
-      <button class="toolbar-btn" title="用车优势" @click="insertAdvantage">
-        <span class="icon-advantage">用车优势</span>
-      </button>
-      <button class="toolbar-btn" title="联系方式" @click="insertContact">
-        <span class="icon-contact">联系方式</span>
-      </button>
+    <button class="toolbar-left-btn" title="模版库">
+      <img src="@/assets/svg/redo.svg" />
+      <text>模版库</text>
+    </button>
+    <div class="editor-right">
+      <div class="toolbar-group-top">
+        <button class="toolbar-btn" title="撤销" :disabled="!canUndo"
+          @click="() => { editor.chain().focus().undo().run() }">
+          <img src="@/assets/svg/revoke.svg" />
+        </button>
+        <button class="toolbar-btn" title="重做" :disabled="!canUndo"
+          @click="() => { editor.chain().focus().redo().run() }">
+          <img src="@/assets/svg/redo.svg">
+        </button>
+        <button class="toolbar-btn" title="格式刷" @click="() => {
+          editor.commands.enableFormatPainter({
+            once: false, // 设置为true表示单次使用，false表示持续使用直到再次点击
+            getChain: () => this.editor.chain()
+          })
+        }">
+          <img src="@/assets/svg/format.svg">
+        </button>
+        <div class="fill"></div>
+        <button class="toolbar-btn" title="颜色" @click="toggleItalic">
+          <img src="@/assets/svg/color.svg">
+        </button>
+        <button class="toolbar-btn" title="加粗" @click="() => { editor.chain().focus().toggleBold().run() }">
+          <img src="@/assets/svg/bold.svg">
+        </button>
+        <button class="toolbar-btn" title="斜体" @click="() => { editor.chain().focus().toggleItalic().run() }">
+          <img src="@/assets/svg/italic.svg">
+        </button>
+        <button class="toolbar-btn" title="下划线" @click="() => { editor.chain().focus().toggleUnderline().run() }">
+          <img src="@/assets/svg/underline.svg">
+        </button>
+        <button class="toolbar-btn" title="背景色" @click="() => { }">
+          <img src="@/assets/svg/backgroundColor.svg">
+        </button>
+        <div class="fill"></div>
+        <button class="toolbar-btn" title="有序列表" @click="() => { editor.chain().focus().toggleOrderedList().run() }">
+          <img src="@/assets/svg/orderedList.svg">
+        </button>
+        <button class="toolbar-btn" title="无序列表" @click="() => { editor.chain().focus().toggleBulletList().run() }">
+          <img src="@/assets/svg/unorderedList.svg">
+        </button>
+        <button class="toolbar-btn" title="文字居左" @click="() => { editor.chain().focus().setTextAlign('left').run() }">
+          <img src="@/assets/svg/alignLeft.svg">
+        </button>
+        <button class="toolbar-btn" title="文字居中" @click="() => { editor.chain().focus().setTextAlign('center').run() }">
+          <img src="@/assets/svg/alignCenter.svg">
+        </button>
+        <button class="toolbar-btn" title="文字居右" @click="() => { editor.chain().focus().setTextAlign('right').run() }">
+          <img src="@/assets/svg/alignRight.svg">
+        </button>
+        <button class="toolbar-btn" title="左右对齐"
+          @click="() => { editor.chain().focus().setTextAlign('justify').run() }">
+          <img src="@/assets/svg/alignJustify.svg">
+        </button>
+        <div class="fill"></div>
+        <button class="toolbar-btn" title="引用" @click="() => { editor.chain().focus().toggleBlockquote().run() }">
+          <img src="@/assets/svg/blockquote.svg">
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -93,6 +74,16 @@ export default {
     editor: {
       type: Object,
       default: null
+    }
+  },
+  computed: {
+    canUndo() {
+      const result = this.editor.can().undo();
+      return result;
+    },
+    canRedo() {
+      const result = this.editor.can().redo();
+      return result;
     }
   },
   methods: {
@@ -207,103 +198,82 @@ export default {
 .editor-toolbar {
   display: flex;
   align-items: center;
-  padding: 8px 12px;
-  background: #f8f9fa;
-  border: 1px solid #e1e5e9;
-  border-radius: 6px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  gap: 4px;
-  flex-wrap: wrap;
-  position: relative;
-  margin-bottom: 10px;
+  padding: 12px;
 }
 
-.toolbar-group {
+.toolbar-left-btn {
   display: flex;
-  align-items: center;
-  gap: 2px;
-  position: relative;
-  border-right: 1px solid #e5e7eb;
-  padding-right: 4px;
-  margin-right: 4px;
-}
-
-.toolbar-group:last-child {
-  border-right: none;
-  padding-right: 0;
-  margin-right: 0;
-}
-
-.toolbar-btn {
-  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: transparent;
+  /* padding: 12px; */
   border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  color: #374151;
-  transition: all 0.2s ease;
+  border: 1px solid #E1E6EF;
+  background-color: #fff;
+  min-height: 88px;
+  min-width: 58px;
+
+  img {
+    margin-bottom: 3px;
+    width: 20px;
+    height: 20px;
+  }
+
+  text {
+    font-size: 14px;
+    font-weight: 400;
+  }
+}
+
+.editor-right {
+  flex: 1;
+  margin-left: 10px;
+}
+
+.toolbar-group-top {
+  display: flex;
+  align-items: center;
   position: relative;
-}
+  gap: 12px;
 
-.toolbar-btn:hover {
-  background: #f3f4f6;
-  color: #1f2937;
-}
-
-.toolbar-btn.active {
-  background: #e5e7eb;
-  color: #111827;
-}
-
-.toolbar-btn:active {
-  transform: scale(0.95);
-}
-
-.media-group .toolbar-btn,
-.special-group .toolbar-btn {
-  font-size: 12px;
-  padding: 0 8px;
-  width: auto;
-}
-
-.special-group .toolbar-btn {
-  white-space: nowrap;
-  color: #4b5563;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .editor-toolbar {
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    padding: 6px;
-  }
-  
-  .toolbar-group {
-    margin-bottom: 4px;
-  }
-  
-  .special-group {
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    width: 100%;
-  }
-  
-  .special-group .toolbar-btn {
-    margin-bottom: 4px;
-    font-size: 11px;
-  }
-  
   .toolbar-btn {
-    width: 28px;
-    height: 28px;
-    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    outline: none;
+    border: none;
+
+    img {
+      width: 16px;
+      height: 16px;
+    }
   }
+
+  > :last-child {
+    margin-right: 0;
+    /* background-color: red; */
+  }
+
+  .toolbar-btn:hover {
+    background: #f3f4f6;
+    color: #1f2937;
+  }
+
+  .toolbar-btn.active {
+    background: #e5e7eb;
+    color: #111827;
+  }
+
+  .fill {
+    width: 1px;
+    height: 14px;
+
+    background: #e5e7eb;
+  }
+
+
 }
-</style>
+</style

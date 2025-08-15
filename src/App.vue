@@ -17,24 +17,11 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const showDropdown = ref(false)
 
-const mainRoutes = [
-  { name: 'WorkSpace', path: '/workspace', meta: { title: '工作区', icon: '🏠' } },
-  { name: 'Editor', path: '/editor', meta: { title: '编辑器', icon: '✏️' } },
-  { name: 'Settings', path: '/settings', meta: { title: '设置', icon: '⚙️' } }
-]
-
-const componentRoutes = [
-  { name: 'TravelCards', path: '/cards/travel', meta: { title: '旅行卡片', icon: '🧳' } },
-  { name: 'RichTravelCards', path: '/cards/rich-travel', meta: { title: '富文本旅行卡片', icon: '🎨' } },
-  { name: 'ImageTextList', path: '/components/image-text-list', meta: { title: '图文列表', icon: '📝' } },
-  { name: 'DoubleText', path: '/components/double-text', meta: { title: '双文本', icon: '📄' } }
-]
 
 const showNavigation = computed(() => {
   // 在404页面隐藏导航
@@ -48,7 +35,6 @@ const showNavigation = computed(() => {
   padding: 0;
   box-sizing: border-box;
   font-family: "PingFang SC";
-  font-weight: 400;
 }
 
 body {

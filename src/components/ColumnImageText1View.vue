@@ -1,24 +1,19 @@
 <template>
-  <node-view-wrapper class="column-image-text1-wrapper" :class="{ 'column-image-text1-selected': diySelected }">
+  <node-view-wrapper class="column-image-text1-wrapper template-node"
+    :class="{ 'template-node-selected': diySelected }">
     <!-- 使用抽取的悬浮操作栏组件 -->
-    <NodeFloatingActions v-if="diySelected" :node="node" :getPos="getPos" :editor="editor" :deleteNode="deleteNode" />
+    <NodeFloatingActions v-if="selected" :node="node" :getPos="getPos" :editor="editor" :deleteNode="deleteNode" />
 
-    <div class="column-image-text1-steps-container">
-      <!-- 遍历步骤 -->
-      <div v-for="(step, index) in node.attrs.steps" :key="index" class="column-image-text1-step">
-        <!-- 图片区域 -->
-        <div class="step-image-container">
-          <img :src="step.imageUrl || 'https://via.placeholder.com/600x400?text=Click+to+upload+image'" 
-               :alt="`步骤${index + 1}图片`" 
-               @error="handleImageError" 
-               class="step-image" />
-        </div>
-
-        <!-- 文字说明区域 - 使用SimpleParagraph -->
-        <div class="step-text-container">
-          <div class="editable-text" @click="focusText(index)">
-            {{ step.text }}
-          </div>
+    <div v-for="(step, index) in node.attrs.steps" :key="index" class="column-image-text1-step">
+      <!-- 图片区域 -->
+      <div class="step-image-container">
+        <img :src="step.imageUrl || 'https://via.placeholder.com/600x400?text=Click+to+upload+image'"
+          :alt="`步骤${index + 1}图片`" @error="handleImageError" class="step-image" />
+      </div>
+      <!-- 文字说明区域 - 使用SimpleParagraph -->
+      <div class="step-text-container">
+        <div class="editable-text" @click="focusText(index)">
+          {{ step.text }}
         </div>
       </div>
     </div>
@@ -26,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue'
+import { defineComponent, type PropType, defineEmits } from 'vue'
 import { NodeViewWrapper } from '@tiptap/vue-3'
 import type { Node } from '@tiptap/pm/model'
 import type { Editor } from '@tiptap/core'
@@ -81,9 +76,10 @@ export default defineComponent({
   },
   watch: {
     'editor.state.selection.$from': {
-      handler(newVal) {
+      handler(newVal, oldVal) {
         if (newVal) {
           this.diySelected = compareNodes(newVal, this.node, this.getPos);
+          console.log(this.diySelected, 'diySelected')
         }
       },
     },
@@ -107,23 +103,10 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .column-image-text1-wrapper {
   position: relative;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-  margin: 16px 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  background-color: white;
-  transition: box-shadow 0.3s ease;
-  padding: 16px;
-}
 
-.column-image-text1-selected {
-  box-shadow: 0 0 0 2px #4285f4;
-}
-
-.column-image-text1-steps-container {
   display: flex;
   flex-direction: row;
   justify-content: space-between;

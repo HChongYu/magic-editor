@@ -1,137 +1,24 @@
 <template>
-    <div class="tiptap-editor">
-        <editor-content :editor="editor" />
-
-        <!-- 添加BubbleMenu组件 -->
-        <template v-if="editor">
-            <bubble-menu :editor="editor" :tippy-options="{ duration: 100 }" :should-show="shouldShowBubbleMenu">
-                <div class="bubble-menu">
-                    <button @click="editor.chain().focus().toggleBold().run()"
-                        :class="{ 'is-active': editor.isActive('bold') }">
-                        粗体
-                    </button>
-                    <button @click="editor.chain().focus().toggleItalic().run()"
-                        :class="{ 'is-active': editor.isActive('italic') }">
-                        斜体
-                    </button>
-                    <template v-if="editor.isActive('heading')">
-                        <button @click="decreaseHeadingLevel()" :disabled="!canDecreaseHeadingLevel()">
-                            H-
-                        </button>
-                        <span>H{{ getCurrentHeadingLevel() }}</span>
-                        <button @click="increaseHeadingLevel()" :disabled="!canIncreaseHeadingLevel()">
-                            H+
-                        </button>
-                    </template>
-                </div>
-            </bubble-menu>
-        </template>
-    </div>
+    <editor-content class="tiptap-editor" :editor="editor" />
 </template>
 
 <script>
 import { Editor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
-import { Extension } from '@tiptap/core'
-import { BubbleMenu } from '@tiptap/extension-bubble-menu'
-
 // 导入扩展
+import Bold from '@tiptap/extension-bold'
 import BulletList from '@tiptap/extension-bullet-list'
 import Heading from '@tiptap/extension-heading'
 import Paragraph from '@tiptap/extension-paragraph'
-import Blockquote from '@tiptap/extension-blockquote'
-
-// 1. 扩展项目符号列表 - 修改键盘快捷键
-const CustomBulletList = BulletList.extend({
-    addKeyboardShortcuts() {
-        return {
-            'Mod-l': () => this.editor.commands.toggleBulletList(),
-        }
-    },
-})
-
-// 2. 扩展标题 - 修改默认设置
-const CustomHeading = Heading.extend({
-    addOptions() {
-        return {
-            ...this.parent?.(),
-            levels: [1, 2, 3],
-        }
-    },
-})
-
-// 3. 扩展段落 - 添加颜色属性
-const CustomParagraph = Paragraph.extend({
-    name: 'paragraph',
-    addAttributes() {
-        return {
-            color: {
-                default: null,
-                parseHTML: element => element.getAttribute('data-color'),
-                renderHTML: attributes => {
-                    if (!attributes.color) return {}
-                    return {
-                        'data-color': attributes.color,
-                        style: `color: ${attributes.color}`,
-                    }
-                },
-            },
-        }
-    },
-})
-
-// 4. 扩展引用块 - 限制内容只能包含段落
-const CustomBlockquote = Blockquote.extend({
-    content: 'paragraph*',
-})
-
-// 5. 创建自定义扩展 - 添加存储功能和键盘快捷键
-const CustomExtension = Extension.create({
-    name: 'customExtension',
-    addStorage() {
-        return {
-            awesomeness: 100
-        }
-    },
-    onUpdate() {
-        this.storage.awesomeness += 1
-    },
-    addKeyboardShortcuts() {
-        return {
-            'Mod-e': () => {
-                this.editor.chain().focus().insertContent('😊').run()
-                return true
-            },
-        }
-    },
-})
-
-// 6. 创建全局文本对齐扩展
-const TextAlign = Extension.create({
-    name: 'textAlign',
-    addGlobalAttributes() {
-        return [
-            {
-                types: ['heading', 'paragraph'],
-                attributes: {
-                    textAlign: {
-                        default: 'left',
-                        renderHTML: attributes => ({
-                            style: `text-align: ${attributes.textAlign}`,
-                        }),
-                        parseHTML: element => element.style.textAlign || 'left',
-                    },
-                },
-            },
-        ]
-    },
-})
-
+import OrderedList from '@tiptap/extension-ordered-list'
+import ListItem from '@tiptap/extension-list-item'
+import Underline from '@tiptap/extension-underline'
+import Highlight from '@tiptap/extension-highlight'
+import TextAlign from '@tiptap/extension-text-align'
 export default {
     name: 'TiptapEditor',
     components: {
-        EditorContent,
-        BubbleMenu,
+        EditorContent
     },
     props: {
         extensions: {
@@ -169,19 +56,17 @@ export default {
                 { value: '#fff', label: '白色' },
             ],
             baseExtensions: [
-                StarterKit.configure({
-                    bulletList: false,
-                    heading: false,
-                    paragraph: false,
-                    blockquote: false,
-                }),
+                StarterKit,
                 BulletList,
+                OrderedList,
                 Heading,
                 Paragraph,
-                Blockquote,
-                BubbleMenu.configure({
-                    element: null, // 我们使用Vue组件，所以这里设为null
-                }),
+                ListItem,
+                Underline,
+                Highlight,
+                TextAlign.configure({
+                    types: ['heading', 'paragraph']
+                })
             ]
         }
     },
@@ -199,7 +84,6 @@ export default {
         initEditor() {
             const extensionsToUse = this.getExtensions()
             const content = this.initialContent || this.getDefaultContent()
-
             this.editor = new Editor({
                 content,
                 extensions: extensionsToUse,
@@ -208,7 +92,7 @@ export default {
                     this.$emit('update', { editor })
                 },
                 onSelectionUpdate: ({ editor }) => {
-                    
+
                     this.$emit('selection-update', editor)
                 },
                 onFocus: ({ editor, event }) => {
@@ -262,7 +146,7 @@ export default {
             let column = 1
             let currentPos = 0
 
-            doc.descendants((node, nodePos) => {
+            doc.descendants((node) => {
                 if (currentPos >= pos) return false
 
                 if (node.isText) {
@@ -369,20 +253,6 @@ export default {
                 }
             }
         },
-
-        insertEmoji(type) {
-            if (!this.editor) return
-
-            const emojiData = EMOJI_DATA[type]
-            if (emojiData) {
-                this.editor.chain().focus().insertEmoji({
-                    emoji: emojiData.emoji,
-                    label: emojiData.label,
-                    type: type,
-                }).run()
-            }
-        },
-
         editSelectedEmoji() {
             if (!this.editor) return
 
@@ -643,22 +513,27 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .tiptap-editor {
     max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
+    margin: 0 20px;
+
+    :deep(.template-node) {
+        // margin-top: 6px 20px 0;
+        padding: 20px 14px;
+        border-radius: 8px;
+        background: #FFF;
+        position: relative;
+    }
+
+    :deep(.template-node-selected) {
+        border: 1px solid #8C88F8;
+        box-shadow: 0 4px 18px 0 rgba(182, 182, 182, 0.25);
+    }
+
+
 }
 
-/* 光标位置指示器样式 */
-.cursor-position-indicator {
-    background: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 6px;
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
 
 .position-info {
     display: flex;
@@ -688,26 +563,23 @@ export default {
     background: #0056b3;
 }
 
-.tiptap-editor {
-  width: 100%;
-  margin: 0 auto;
-  padding: 0; /* 移除内边距 */
-}
+
 
 /* 编辑器失去焦点时的视觉提示 */
 :deep(.ProseMirror) {
-  border: none; /* 移除边框 */
-  border-radius: 0;
-  padding: 12px;
-  min-height: 200px;
-  height: auto;
-  outline: none;
-  transition: none;
+    border: none;
+    /* 移除边框 */
+    border-radius: 0;
+    min-height: 200px;
+    height: auto;
+    outline: none;
+    transition: none;
 }
 
 .tiptap-editor:has(.ProseMirror:focus) :deep(.ProseMirror) {
-  border-color: transparent;
-  box-shadow: none; /* 移除聚焦时的阴影 */
+    border-color: transparent;
+    box-shadow: none;
+    /* 移除聚焦时的阴影 */
 }
 
 .bubble-menu {
@@ -727,24 +599,5 @@ export default {
     margin: 0 0.2rem;
     border-radius: 0.3rem;
     cursor: pointer;
-}
-
-.bubble-menu button:hover {
-    background-color: #2D2D2D;
-}
-
-.bubble-menu button.is-active {
-    background-color: #1F1F1F;
-}
-
-.bubble-menu button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.bubble-menu span {
-    color: #FFF;
-    font-size: 0.85rem;
-    padding: 0.2rem 0.4rem;
 }
 </style>

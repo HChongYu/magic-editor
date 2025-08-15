@@ -10,7 +10,7 @@
       <ProductHeader />
 
       <div class="editor-container">
-        <EditorToolbar :editor="editorInstance" />
+        <EditorToolbar :editor="editorInstance" v-if="editorInstance" />
         <TiptapEditor ref="tiptapEditor" :extensions="customExtensions" :initial-content="editorContent"
           :show-toolbar="showEditorToolbar" @editor-ready="onEditorReady" @update="onEditorUpdate"
           @selection-update="onSelectionUpdate" />
@@ -25,6 +25,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import FormatPainter from 'tiptap-extension-format-painter'
 import TiptapEditor from '@/components/TiptapEditor'
 import LeftSidebar from '@/components/LeftSidebar'
 import EditorToolbar from '@/components/EditorToolbar'
@@ -41,10 +42,10 @@ import { TemplateNodeType } from '@/enums'
 const editorInstance = ref(null)
 const showEditorToolbar = ref(true)
 const editorContent = ref('')
-const editorHTML = ref('')
 const tiptapEditor = ref(null)
 
 const customExtensions = [
+  FormatPainter,
   SimpleHeading,
   SimpleParagraph,
   LeftImageText1,
@@ -107,10 +108,6 @@ function onEditorUpdate(editor) {
   }
 
 }
-
-function onSelectionUpdate(editor) {
-  // 处理选择更新
-}
 </script>
 
 <style scoped>
@@ -141,7 +138,6 @@ function onSelectionUpdate(editor) {
   width: 570px;
   margin-left: 380px;
   margin-right: 350px;
-  padding: 0 20px;
   min-height: 100%;
   height: auto;
   /* 添加左右内边距 */

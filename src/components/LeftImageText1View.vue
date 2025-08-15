@@ -1,21 +1,16 @@
 <template>
-    <node-view-wrapper class="left-image-text1-wrapper" :class="{ 'left-image-text1-selected': diySelected }">
+    <node-view-wrapper class="left-image-text1 template-node" :class="{ 'template-node-selected': diySelected }">
         <!-- 使用抽取的悬浮操作栏组件 -->
         <NodeFloatingActions v-if="diySelected" :node="node" :getPos="getPos" :editor="editor"
             :deleteNode="deleteNode" />
-
-        <div class="left-image-text1-container">
-            <!-- 图片区域 - 左侧 -->
-            <div class="image-container">
-                <img :src="node.attrs.imageUrl || 'https://via.placeholder.com/600x400?text=Click+to+upload+image'"
-                    alt="图片" @error="handleImageError" class="left-image" />
-            </div>
-
-            <div class="left-image-text1-content">
-                <NodeViewContent class="content-area">
-                    <!-- SimpleHeading 和 SimpleParagraph 将在这里渲染 -->
-                </NodeViewContent>
-            </div>
+        <div class="image-container">
+            <img :src="node.attrs.imageUrl || 'https://via.placeholder.com/600x400?text=Click+to+upload+image'" alt="图片"
+                @error="handleImageError" class="left-image" />
+        </div>
+        <div class="left-image-text1-content">
+            <NodeViewContent class="content-area">
+                <!-- SimpleHeading 和 SimpleParagraph 将在这里渲染 -->
+            </NodeViewContent>
         </div>
     </node-view-wrapper>
 </template>
@@ -88,50 +83,36 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
-.left-image-text1-wrapper {
-    position: relative;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-    margin: 16px 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    background-color: white;
-    transition: box-shadow 0.3s ease;
-}
-
-.left-image-text1-selected {
-    box-shadow: 0 0 0 2px #4285f4;
-}
-
-/* 水平布局容器 */
-.left-image-text1-container {
+<style lang="scss" scoped>
+.left-image-text1 {
     display: flex;
     flex-direction: row;
-    height: 180px; /* 设置固定高度 */
-}
 
-.image-container {
-    width: 180px; /* 固定宽度 */
-    height: 100%;
-    flex-shrink: 0; /* 防止图片区域被压缩 */
-}
 
-.left-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
+    .image-container {
+        width: 154px;
+        /* 固定宽度 */
+        height: 154px;
+        // flex-shrink: 0;
+        /* 防止图片区域被压缩 */
 
-.left-image-text1-content {
-    padding: 16px;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
+        .left-image {
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+        }
+    }
 
-.content-area {
-    flex-grow: 1;
+    .left-image-text1-content {
+        padding: 10px 0 10px 16px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        .content-area {
+            flex-grow: 1;
+        }
+    }
 }
 </style>

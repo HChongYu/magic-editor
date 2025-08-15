@@ -1,5 +1,5 @@
 <template>
-  <div class="floating-actions" @click.stop="()=>{}">
+  <div class="floating-actions" @click.stop.prevent="()=>{}">
     <button class="action-btn add-btn" @click="addCurrentNodeClick" title="添加新节点">
       <span>+</span>
     </button>
@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { type PropType } from 'vue'
+import { type PropType, defineProps, defineEmits } from 'vue'
 import type { Node } from '@tiptap/pm/model'
 import type { Editor } from '@tiptap/core'
 import { addCurrentNode, moveNodeDown } from '@/utils/editorUtils'

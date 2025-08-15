@@ -11,8 +11,19 @@ export function compareNodes(selectNode, curNode, getPos) {
 
     // 获取当前节点的位置
     const currentNodePos = getPos();
-
-    // 遍历从光标位置向上的所有节点层级
+    const nodeSize = curNode.nodeSize;
+    
+    // 检查选择是否在当前节点范围内（包括子节点）
+    const nodeFrom = currentNodePos;
+    const nodeTo = currentNodePos + nodeSize;
+    const selectionPos = selectNode.pos;
+    
+    // 如果选择位置在节点范围内，则认为节点被选中
+    if (selectionPos >= nodeFrom && selectionPos < nodeTo) {
+        return true;
+    }
+    
+    // 原有的逻辑：遍历从光标位置向上的所有节点层级
     for (let depth = selectNode.depth; depth > 0; depth--) {
         const pos = selectNode.start(depth) - 1; // 获取该层级节点的起始位置
 
