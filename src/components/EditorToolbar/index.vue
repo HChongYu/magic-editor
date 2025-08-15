@@ -35,9 +35,17 @@
         <button class="toolbar-btn" title="下划线" @click="() => { editor.chain().focus().toggleUnderline().run() }">
           <img src="@/assets/svg/underline.svg">
         </button>
-        <button class="toolbar-btn" title="背景色" @click="() => { }">
-          <img src="@/assets/svg/backgroundColor.svg">
-        </button>
+        <div class="toolbar-btn-with-picker" ref="bgColorContainer">
+          <button class="toolbar-btn" title="背景色" @click="toggleBgColorPicker">
+            <img src="@/assets/svg/backgroundColor.svg">
+            <span class="color-indicator" :style="{ backgroundColor: currentBgColor }"></span>
+          </button>
+          <color-picker 
+            :visible="showBgColorPicker" 
+            @select="setBgColor" 
+            @close="showBgColorPicker = false"
+          />
+        </div>
         <div class="fill"></div>
         <button class="toolbar-btn" title="有序列表" @click="() => { editor.chain().focus().toggleOrderedList().run() }">
           <img src="@/assets/svg/orderedList.svg">
@@ -68,12 +76,23 @@
 </template>
 
 <script>
+import ColorPicker from '../ColorPicker.vue'
+
 export default {
   name: 'EditorToolbar',
+  components: {
+    ColorPicker
+  },
   props: {
     editor: {
       type: Object,
       default: null
+    }
+  },
+  data() {
+    return {
+      showBgColorPicker: false,
+      currentBgColor: 'transparent'
     }
   },
   computed: {
@@ -277,3 +296,17 @@ export default {
 
 }
 </style
+
+.toolbar-btn-with-picker {
+  position: relative;
+}
+
+.color-indicator {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 3px;
+  border-radius: 1px;
+}
