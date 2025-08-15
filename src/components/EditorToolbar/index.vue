@@ -23,9 +23,12 @@
           <img src="@/assets/svg/format.svg">
         </button>
         <div class="fill"></div>
-        <button class="toolbar-btn" title="颜色" @click="toggleItalic">
-          <img src="@/assets/svg/color.svg">
-        </button>
+        <div class="toolbar-btn-with-picker" ref="colorPickerContainer">
+          <button class="toolbar-btn" title="颜色" @click="toggleColorPicker('text')">
+            <img src="@/assets/svg/color.svg">
+            <span class="color-indicator" :style="{ backgroundColor: currentTextColor }"></span>
+          </button>
+        </div>
         <button class="toolbar-btn" title="加粗" @click="() => { editor.chain().focus().toggleBold().run() }">
           <img src="@/assets/svg/bold.svg">
         </button>
@@ -36,16 +39,14 @@
           <img src="@/assets/svg/underline.svg">
         </button>
         <div class="toolbar-btn-with-picker" ref="bgColorContainer">
-          <button class="toolbar-btn" title="背景色" @click="toggleBgColorPicker">
+          <button class="toolbar-btn" title="背景色" @click="toggleColorPicker('background')">
             <img src="@/assets/svg/backgroundColor.svg">
             <span class="color-indicator" :style="{ backgroundColor: currentBgColor }"></span>
           </button>
-          <color-picker 
-            :visible="showBgColorPicker" 
-            @select="setBgColor" 
-            @close="showBgColorPicker = false"
-          />
         </div>
+        <!-- 共用的颜色选择器 -->
+        <color-picker :visible="showColorPicker" @select="handleColorSelect" @close="showColorPicker = false"
+          v-if="colorPickerContainer || bgColorContainer" :style="colorPickerStyle" />
         <div class="fill"></div>
         <button class="toolbar-btn" title="有序列表" @click="() => { editor.chain().focus().toggleOrderedList().run() }">
           <img src="@/assets/svg/orderedList.svg">
@@ -91,8 +92,13 @@ export default {
   },
   data() {
     return {
-      showBgColorPicker: false,
-      currentBgColor: 'transparent'
+      showColorPicker: false,
+      currentColorMode: null, // 'text' 或 'background'
+      currentTextColor: '#000000',
+      currentBgColor: 'transparent',
+      colorPickerStyle: {
+        left: '0px'
+      }
     }
   },
   computed: {
@@ -130,6 +136,61 @@ export default {
     toggleHighlight() {
       if (this.editor) {
         this.editor.chain().focus().toggleHighlight().run()
+      }
+    },
+
+    // 颜色选择器方法
+    toggleColorPicker(mode) {
+      // 如果已经显示且模式相同，则隐藏
+      if (this.showColorPicker && this.currentColorMode === mode) {
+        this.showColorPicker = false;
+        return;
+      }
+
+      // 设置当前模式
+      this.currentColorMode = mode;
+
+      // 计算颜色选择器位置
+      this.$nextTick(() => {
+        const container = mode === 'text' ? this.$refs.colorPickerContainer : this.$refs.bgColorContainer;
+        if (container) {
+          const rect = container.getBoundingClientRect();
+          this.colorPickerStyle = {
+            left: `${rect.left}px`,
+            top: `${rect.bottom + window.scrollY}px`,
+            position: 'fixed'
+          };
+        }
+        this.showColorPicker = true;
+      });
+    },
+
+    handleColorSelect(color) {
+      if (this.currentColorMode === 'text') {
+        this.setTextColor(color);
+      } else if (this.currentColorMode === 'background') {
+        this.setBgColor(color);
+      }
+      this.showColorPicker = false;
+    },
+
+    setTextColor(color) {
+      this.currentTextColor = color;
+      if (this.editor) {
+        this.editor.chain().focus().setColor(color).run();
+      }
+    },
+
+    setBgColor(color) {
+      this.currentBgColor = color;
+      if (this.editor) {
+        // 如果编辑器有设置背景色的方法，调用它
+        if (this.editor.can().setBackgroundColor) {
+          this.editor.chain().focus().setBackgroundColor(color).run();
+        } else {
+          // 使用highlight扩展设置背景色
+          this.editor.chain().focus().toggleHighlight({ color }).run();
+        }
       }
     },
 
@@ -209,6 +270,19 @@ export default {
         this.editor.chain().focus().insertContent('<div class="contact-info">联系方式内容</div>').run()
       }
     }
+  },
+  mounted() {
+    // 点击外部关闭颜色选择器
+    document.addEventListener('click', (e) => {
+      if (this.showColorPicker &&
+        !this.$refs.colorPickerContainer?.contains(e.target) &&
+        !this.$refs.bgColorContainer?.contains(e.target)) {
+        this.showColorPicker = false;
+      }
+    });
+  },
+  beforeUnmount() {
+    document.removeEventListener('click');
   }
 }
 </script>
@@ -264,6 +338,7 @@ export default {
     background: #fff;
     outline: none;
     border: none;
+    position: relative;
 
     img {
       width: 16px;
@@ -273,7 +348,6 @@ export default {
 
   > :last-child {
     margin-right: 0;
-    /* background-color: red; */
   }
 
   .toolbar-btn:hover {
@@ -289,13 +363,9 @@ export default {
   .fill {
     width: 1px;
     height: 14px;
-
     background: #e5e7eb;
   }
-
-
 }
-</style
 
 .toolbar-btn-with-picker {
   position: relative;
@@ -303,10 +373,11 @@ export default {
 
 .color-indicator {
   position: absolute;
-  bottom: 4px;
+  bottom: 0;
   left: 50%;
   transform: translateX(-50%);
   width: 16px;
   height: 3px;
   border-radius: 1px;
 }
+</style>
