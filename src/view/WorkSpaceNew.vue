@@ -6,7 +6,7 @@
 
     <!-- 主内容区 -->
     <main class="main-content">
-      <!-- 添加产品头部组件 -->
+      <!-- 添加产品头部组件 -->11
       <ProductHeader />
 
       <div class="editor-container">
